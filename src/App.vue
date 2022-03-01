@@ -85,6 +85,10 @@ export default {
   height: 70%;
   border-style: solid;
   border-color: green;
+  background-image: url('assets/demon.png'),url('assets/demon.png'),url('assets/demon.png');
+  background-size: contain,contain,contain;
+  background-repeat: no-repeat,no-repeat,no-repeat;
+  background-position: 10% 100%,center,90% 100%;
 }
 .textBox {
   height: 30%;
