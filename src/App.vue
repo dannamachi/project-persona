@@ -8,11 +8,14 @@
     }'>
 
 
-      <div class='container-fluid aboveText'></div>
-      <div class='container-fluid textBox'>
+      <div class='container-fluid aboveText'>
         <button @click='toggleShowing("left")'>left</button>
         <button @click='toggleShowing("center")'>center</button>
         <button @click='toggleShowing("right")'>right</button>
+      </div>
+      <div class='container-fluid textBox'>
+          <p class='text-center speakerBox'>{{ speaker }}</p>
+          <p class='text-start text-wrap text-break textingBox'>{{ showingText }}</p>
       </div>
 
     </div>
@@ -24,7 +27,9 @@ export default {
   name: 'App',
   data() {
     return {
-      showing: "left"
+      showing: "left",
+      showingText: "Jfdjnsfjsn is simply dummy text of the printing and typesetting industry. ejcnjsdn has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+      speaker: 'hello'
     }
   },
   methods: {
@@ -41,7 +46,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #ffffff;
   /* margin-top: 60px; */
 }
 
@@ -88,7 +93,7 @@ export default {
   background-image: url('assets/demon.png'),url('assets/demon.png'),url('assets/demon.png');
   background-size: contain,contain,contain;
   background-repeat: no-repeat,no-repeat,no-repeat;
-  background-position: 10% 100%,center,90% 100%;
+  background-position: 5% 100%,center,95% 100%;
 }
 .textBox {
   height: 30%;
@@ -98,6 +103,18 @@ export default {
   background-position: left;
   background-size: 100% 100%;
   background-repeat: no-repeat;
+  padding-top: 3.5vmin;
+}
+
+.speakerBox {
+  font-size: 3.5vmin;
+  margin: 1vmin;
+}
+.textingBox {
+  width: 100%;
+  font-size: 3vmin;
+  margin-left: 4vmin;
+  padding-right: 5vmin;
 }
 
 </style>
