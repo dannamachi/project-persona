@@ -6,9 +6,15 @@
       showRight: showing == "right",
       showCenter: showing == "center"
     }'>
-      <button @click='toggleShowing("left")'>left</button>
-      <button @click='toggleShowing("center")'>center</button>
-      <button @click='toggleShowing("right")'>right</button>
+
+
+      <div class='container-fluid aboveText'></div>
+      <div class='container-fluid textBox'>
+        <button @click='toggleShowing("left")'>left</button>
+        <button @click='toggleShowing("center")'>center</button>
+        <button @click='toggleShowing("right")'>right</button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -74,4 +80,20 @@ export default {
 .showCenter {
   background-position: center;
 }
+
+.aboveText {
+  height: 70%;
+  border-style: solid;
+  border-color: green;
+}
+.textBox {
+  height: 30%;
+  border-style: solid;
+  border-color: greenyellow;
+  background-image: url('assets/textbox.jpeg');
+  background-position: left;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
 </style>
