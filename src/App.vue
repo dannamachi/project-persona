@@ -12,10 +12,12 @@
         <button @click='toggleShowing("left")'>left</button>
         <button @click='toggleShowing("center")'>center</button>
         <button @click='toggleShowing("right")'>right</button>
+        <button @click='restartScript()'>restart</button>
+        <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
       </div>
-      <div class='container-fluid textBox'>
-          <p class='text-center speakerBox'>{{ speaker }}</p>
-          <p class='text-start text-wrap text-break textingBox'>{{ showingText }}</p>
+      <div class='container-fluid textBox' @click='advanceText()'>
+          <p class='text-center speakerBox'>{{ isLoaded() ? getCurrentLine().speaker.name : 'no one' }}</p>
+          <p class='text-start text-wrap text-break textingBox'>{{ isLoaded() ? getCurrentLine().text : 'nothing at all' }}</p>
       </div>
 
     </div>
@@ -23,16 +25,65 @@
 </template>
 
 <script>
+import { reactive } from 'vue'
+
 export default {
   name: 'App',
   data() {
     return {
       showing: "left",
       showingText: "Jfdjnsfjsn is simply dummy text of the printing and typesetting industry. ejcnjsdn has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-      speaker: 'hello'
+      speaker: 'hello',
+      dialogue: {
+        sceneName: null,
+        lineName: null
+      },
+      canAdvance: false
     }
   },
+  setup() {
+    var script = reactive({})
+    return { script }
+  },
+  created() {
+    this.script = require('./assets/script.json');
+    this.restartScript()
+  },
   methods: {
+    restartScript() {
+      // first scene
+      this.dialogue.sceneName = this.script.meta__startName.slice(7)
+      this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
+      this.canAdvance = true
+    },
+    isLoaded() {
+      return this.dialogue.sceneName && this.dialogue.lineName
+    },
+    getCurrentScene() {
+      return this.script['scene__' + this.dialogue.sceneName]
+    },
+    getCurrentLine() {
+      return this.script['scene__' + this.dialogue.sceneName]['line__' + this.dialogue.lineName]
+    },
+    advanceText() {
+      if (this.isLoaded() && this.canAdvance) {
+        // check if scene end
+        if (this.getCurrentScene().meta__endName == 'line__' + this.dialogue.lineName || this.getCurrentLine().next == '') {
+          // check if script end
+          if (this.script.meta__endName == 'scene__' + this.dialogue.sceneName || this.getCurrentScene().next == '') {
+            // end script
+            this.canAdvance = false
+          } else {
+            // next scene
+            this.dialogue.sceneName = this.getCurrentScene().next
+            this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
+          }
+        } else {
+          // next line
+          this.dialogue.lineName = this.getCurrentLine().next
+        }
+      }
+    },
     toggleShowing(thing) {
       if (window.innerWidth < 1000) this.showing = thing
     }
