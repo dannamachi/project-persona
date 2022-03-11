@@ -7,8 +7,9 @@
       showCenter: showing == "center"
     }'>
 
-
-      <div class='container-fluid aboveText'>
+      <div class='container-fluid aboveText' :style="{ 
+        backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
+       }">
         <button @click='toggleShowing("left")'>left</button>
         <button @click='toggleShowing("center")'>center</button>
         <button @click='toggleShowing("right")'>right</button>
@@ -26,6 +27,7 @@
 
 <script>
 import { reactive } from 'vue'
+const assetPref = './assets/'
 
 export default {
   name: 'App',
@@ -38,7 +40,14 @@ export default {
         sceneName: null,
         lineName: null
       },
-      canAdvance: false
+      canAdvance: false,
+      sprite: {
+        left: '',
+        right: '',
+        center: '',
+        player: ''
+      },
+      images: {}
     }
   },
   setup() {
@@ -46,7 +55,22 @@ export default {
     return { script }
   },
   created() {
-    this.script = require('./assets/script.json');
+    this.script = require(assetPref + 'script.json');
+    // set up positions
+    for (var pos of this.script.meta__posList) {
+      if (this.sprite[pos] == null) this.sprite[pos] = ''
+    }
+
+    // load image
+    for (const [key, value] of Object.entries(this.script)) {
+      if (key.startsWith('char__')) {
+        for (var exp of value.expList) {
+          this.images[value.keyName + "_" + exp] = require(assetPref + value.keyName + "_" + exp + ".png")
+        }
+      }
+    }
+
+    // restart script pointer
     this.restartScript()
   },
   methods: {
@@ -81,12 +105,28 @@ export default {
         } else {
           // next line
           this.dialogue.lineName = this.getCurrentLine().next
+          this.loadSprite()
         }
       }
     },
     toggleShowing(thing) {
       if (window.innerWidth < 1000) this.showing = thing
-    }
+    },
+    loadSprite() {
+      // clear display
+      for (const [key1, value1] of Object.entries(this.sprite)) {
+        value1
+        this.sprite[key1] = ''
+      }
+      // load display
+      var line = this.getCurrentLine()
+      for (const [key, value] of Object.entries(line)) {
+        if (key.startsWith('sprite__')) {
+          // assume _ in between and png
+          this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+        }
+      }
+    },
   }
 }
 </script>
@@ -141,7 +181,7 @@ export default {
   height: 70%;
   border-style: solid;
   border-color: green;
-  background-image: url('assets/demon.png'),url('assets/demon.png'),url('assets/demon.png');
+  /* background-image: url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'); */
   background-size: contain,contain,contain;
   background-repeat: no-repeat,no-repeat,no-repeat;
   background-position: 5% 100%,center,95% 100%;
