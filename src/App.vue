@@ -5,7 +5,9 @@
       showLeft: showing == "left",
       showRight: showing == "right",
       showCenter: showing == "center"
-    }'>
+    }' :style="{ 
+        backgroundImage: 'url(\'' + background + '\')'
+       }">
 
       <div class='container-fluid aboveText' :style="{ 
         backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
@@ -47,7 +49,8 @@ export default {
         center: '',
         player: ''
       },
-      images: {}
+      images: {},
+      background: ''
     }
   },
   setup() {
@@ -70,6 +73,11 @@ export default {
       }
     }
 
+    // load background
+    for (var bg of this.script.meta__bgList) {
+      if (bg != 'none') this.images['bg_' + bg] = require(assetPref + 'bg_' + bg + '.png')
+    }
+
     // restart script pointer
     this.restartScript()
   },
@@ -78,6 +86,7 @@ export default {
       // first scene
       this.dialogue.sceneName = this.script.meta__startName.slice(7)
       this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
+      this.loadScene()
       this.canAdvance = true
     },
     isLoaded() {
@@ -101,6 +110,7 @@ export default {
             // next scene
             this.dialogue.sceneName = this.getCurrentScene().next
             this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
+            this.loadScene()
           }
         } else {
           // next line
@@ -111,6 +121,10 @@ export default {
     },
     toggleShowing(thing) {
       if (window.innerWidth < 1000) this.showing = thing
+    },
+    loadScene() {
+      var scene = this.getCurrentScene()
+      this.background = this.images['bg_' + scene.background]
     },
     loadSprite() {
       // clear display
@@ -160,7 +174,7 @@ export default {
   height: 100vh;
   max-width: calc(100vh * 16 / 10);
   max-height: 100vh;
-  background-image: url('assets/bg.png');
+  /* background-image: url('assets/bg.png'); */
   background-size: calc(100vh * 16 / 10) 100vh;
   /* background-size: 100% 100%; */
   background-repeat: no-repeat;
