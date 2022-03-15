@@ -12,9 +12,9 @@
       <div class='container-fluid aboveText' :style="{ 
         backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
        }">
-        <button @click='toggleShowing("left")'>left</button>
+        <!-- <button @click='toggleShowing("left")'>left</button>
         <button @click='toggleShowing("center")'>center</button>
-        <button @click='toggleShowing("right")'>right</button>
+        <button @click='toggleShowing("right")'>right</button> -->
         <button @click='restartScript()'>restart</button>
         <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
       </div>
@@ -65,10 +65,15 @@ export default {
     }
 
     // load image
+    const defaultImg = require(assetPref + 'default.png')
     for (const [key, value] of Object.entries(this.script)) {
       if (key.startsWith('char__')) {
         for (var exp of value.expList) {
-          this.images[value.keyName + "_" + exp] = require(assetPref + value.keyName + "_" + exp + ".png")
+          try {
+            this.images[value.keyName + "_" + exp] = require(assetPref + value.keyName + "_" + exp + ".png")
+          } catch(e) {
+            this.images[value.keyName + "_" + exp] = defaultImg
+          }
         }
       }
     }
