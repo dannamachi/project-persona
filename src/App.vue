@@ -20,7 +20,7 @@
       </div>
       <div class='container-fluid textBox' @click='advanceText()'>
           <p class='text-center speakerBox'>{{ isLoaded() ? getCurrentLine().speaker.name : 'no one' }}</p>
-          <p class='text-start text-wrap text-break textingBox'>{{ isLoaded() ? getCurrentLine().text : 'nothing at all' }}</p>
+          <p class='text-start text-wrap text-break textingBox'>{{ isLoaded() ? getCurrentText() : 'nothing at all' }}</p>
       </div>
 
     </div>
@@ -145,6 +145,57 @@ export default {
           this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
         }
       }
+    },
+    getCurrentText() {
+      var text = this.parseNick(this.parseNick(this.getCurrentLine().text), 'p')
+      if (text.length > 1) return text[0].toUpperCase() + text.substring(1)
+      else if (text.length > 0) return text.toUpperCase()
+      else return '---'
+    },
+    getMatchingNick(thing) {
+      for (var nick of this.script.nicks) {
+        if (nick.name == thing) return nick
+      }
+      return null
+    },
+    // TO DO: parse and replace with corresponding nick/pronoun
+    parseNick(line, type='n') {
+      var startSym = '{@'
+      var endSym = '@}'
+      if (type == 'p') {
+        startSym = '{!'
+        endSym = '!}'
+      }
+      var position1 = line.search(startSym);
+      var position2 = -1
+      if (position1 != -1) position2 = line.substring(position1).search(endSym)
+      if (position1 == -1 || position2 == -1) return line
+
+      var text = line
+      var nick
+      var newLine = ''
+      var someCond = true
+      while (someCond) {
+        nick = text.substring(position1 + 2, position1 + position2)
+        var matchingNick = this.getMatchingNick(nick)
+        if (matchingNick != null) {
+          if (type == 'p') newLine += text.substring(0, position1) + matchingNick.pronoun
+          else newLine += text.substring(0, position1) + matchingNick.nick
+        } else {
+          newLine += text.substring(0, position1)
+        }
+        // console.log('text:' + text)
+        // console.log('newline:' + newLine)
+        text = text.substring(position1 + position2 + 2)
+        position1 = text.search(startSym);
+        if (position1 != -1) position2 = text.substring(position1).search(endSym)
+        if (position1 == -1 || position2 == -1) {
+          newLine += text
+          someCond = false
+        }
+      }
+      // console.log(newLine)
+      return newLine
     },
   }
 }
