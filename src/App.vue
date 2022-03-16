@@ -1,201 +1,79 @@
 <template>
-  <div class='wrapper'>
-    <div :class='{
-      gameBox: true,
-      showLeft: showing == "left",
-      showRight: showing == "right",
-      showCenter: showing == "center"
-    }' :style="{ 
-        backgroundImage: 'url(\'' + background + '\')'
-       }">
-
-      <div class='container-fluid aboveText' :style="{ 
-        backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
-       }">
-        <!-- <button @click='toggleShowing("left")'>left</button>
-        <button @click='toggleShowing("center")'>center</button>
-        <button @click='toggleShowing("right")'>right</button> -->
-        <button @click='restartScript()'>restart</button>
-        <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
-      </div>
-      <div class='container-fluid textBox' @click='advanceText()'>
-          <p class='text-center speakerBox'>{{ isLoaded() ? getCurrentLine().speaker.name : 'no one' }}</p>
-          <p class='text-start text-wrap text-break textingBox'>{{ isLoaded() ? getCurrentText() : 'nothing at all' }}</p>
-      </div>
-
-    </div>
+  <div>
+    <DialogueFrame v-bind:ui='ui' v-bind:images='images'
+    v-bind:sections='sections' />
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue'
-const assetPref = './assets/'
+import DialogueFrame from './frames/DialogueFrame.vue'
+
+const PREFIX_SPRITE = './assets/sprites/'
+const PREFIX_BG = './assets/backgrounds/'
+const PREFIX_UI = './assets/interfaces/'
+const PREFIX_SCRIPT = './assets/scripts/'
 
 export default {
   name: 'App',
+  components: {
+    DialogueFrame
+  },
   data() {
     return {
-      showing: "left",
-      showingText: "Jfdjnsfjsn is simply dummy text of the printing and typesetting industry. ejcnjsdn has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-      speaker: 'hello',
-      dialogue: {
-        sceneName: null,
-        lineName: null
-      },
-      canAdvance: false,
-      sprite: {
-        left: '',
-        right: '',
-        center: '',
-        player: ''
+      ui: {
+        textbox: ''
       },
       images: {},
-      background: ''
     }
   },
   setup() {
-    var script = reactive({})
-    return { script }
+    var sections = reactive([])
+    return { sections }
   },
   created() {
-    this.script = require(assetPref + 'script.json');
+    this.loadScripts()
     // set up positions
-    for (var pos of this.script.meta__posList) {
-      if (this.sprite[pos] == null) this.sprite[pos] = ''
-    }
+    // for (var pos of this.script.meta__posList) {
+    //   if (this.sprite[pos] == null) this.sprite[pos] = ''
+    // }
 
-    // load image
-    const defaultImg = require(assetPref + 'default.png')
-    for (const [key, value] of Object.entries(this.script)) {
-      if (key.startsWith('char__')) {
-        for (var exp of value.expList) {
-          try {
-            this.images[value.keyName + "_" + exp] = require(assetPref + value.keyName + "_" + exp + ".png")
-          } catch(e) {
-            this.images[value.keyName + "_" + exp] = defaultImg
+    // load interfaces
+    this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
+
+    // default sprite
+    const defaultImg = require(PREFIX_SPRITE + 'default.png')
+
+    for (var sect of this.sections) {
+      // load character sprites
+      for (const [key, value] of Object.entries(sect)) {
+        if (key.startsWith('char__')) {
+          for (var exp of value.expList) {
+            try {
+              this.images[value.keyName + "_" + exp] = require(PREFIX_SPRITE + value.keyName + "_" + exp + ".png")
+            } catch(e) {
+              this.images[value.keyName + "_" + exp] = defaultImg
+            }
           }
         }
       }
+
+      // load background
+      for (var bg of sect.meta__bgList) {
+        if (bg != 'none') this.images['bg_' + bg] = require(PREFIX_BG + 'bg_' + bg + '.png')
+      }
+
     }
 
-    // load background
-    for (var bg of this.script.meta__bgList) {
-      if (bg != 'none') this.images['bg_' + bg] = require(assetPref + 'bg_' + bg + '.png')
-    }
-
-    // restart script pointer
-    this.restartScript()
   },
   methods: {
-    restartScript() {
-      // first scene
-      this.dialogue.sceneName = this.script.meta__startName.slice(7)
-      this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
-      this.loadScene()
-      this.canAdvance = true
-    },
-    isLoaded() {
-      return this.dialogue.sceneName && this.dialogue.lineName
-    },
-    getCurrentScene() {
-      return this.script['scene__' + this.dialogue.sceneName]
-    },
-    getCurrentLine() {
-      return this.script['scene__' + this.dialogue.sceneName]['line__' + this.dialogue.lineName]
-    },
-    advanceText() {
-      if (this.isLoaded() && this.canAdvance) {
-        // check if scene end
-        if (this.getCurrentScene().meta__endName == 'line__' + this.dialogue.lineName || this.getCurrentLine().next == '') {
-          // check if script end
-          if (this.script.meta__endName == 'scene__' + this.dialogue.sceneName || this.getCurrentScene().next == '') {
-            // end script
-            this.canAdvance = false
-          } else {
-            // next scene
-            this.dialogue.sceneName = this.getCurrentScene().next
-            this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
-            this.loadScene()
-          }
-        } else {
-          // next line
-          this.dialogue.lineName = this.getCurrentLine().next
-          this.loadSprite()
-        }
-      }
-    },
-    toggleShowing(thing) {
-      if (window.innerWidth < 1000) this.showing = thing
-    },
-    loadScene() {
-      var scene = this.getCurrentScene()
-      this.background = this.images['bg_' + scene.background]
-    },
-    loadSprite() {
-      // clear display
-      for (const [key1, value1] of Object.entries(this.sprite)) {
-        value1
-        this.sprite[key1] = ''
-      }
-      // load display
-      var line = this.getCurrentLine()
-      for (const [key, value] of Object.entries(line)) {
-        if (key.startsWith('sprite__')) {
-          // assume _ in between and png
-          this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
-        }
-      }
-    },
-    getCurrentText() {
-      var text = this.parseNick(this.parseNick(this.getCurrentLine().text), 'p')
-      if (text.length > 1) return text[0].toUpperCase() + text.substring(1)
-      else if (text.length > 0) return text.toUpperCase()
-      else return '---'
-    },
-    getMatchingNick(thing) {
-      for (var nick of this.script.nicks) {
-        if (nick.name == thing) return nick
-      }
-      return null
-    },
-    // TO DO: parse and replace with corresponding nick/pronoun
-    parseNick(line, type='n') {
-      var startSym = '{@'
-      var endSym = '@}'
-      if (type == 'p') {
-        startSym = '{!'
-        endSym = '!}'
-      }
-      var position1 = line.search(startSym);
-      var position2 = -1
-      if (position1 != -1) position2 = line.substring(position1).search(endSym)
-      if (position1 == -1 || position2 == -1) return line
-
-      var text = line
-      var nick
-      var newLine = ''
-      var someCond = true
-      while (someCond) {
-        nick = text.substring(position1 + 2, position1 + position2)
-        var matchingNick = this.getMatchingNick(nick)
-        if (matchingNick != null) {
-          if (type == 'p') newLine += text.substring(0, position1) + matchingNick.pronoun
-          else newLine += text.substring(0, position1) + matchingNick.nick
-        } else {
-          newLine += text.substring(0, position1)
-        }
-        // console.log('text:' + text)
-        // console.log('newline:' + newLine)
-        text = text.substring(position1 + position2 + 2)
-        position1 = text.search(startSym);
-        if (position1 != -1) position2 = text.substring(position1).search(endSym)
-        if (position1 == -1 || position2 == -1) {
-          newLine += text
-          someCond = false
-        }
-      }
-      // console.log(newLine)
-      return newLine
+    // import all scripts here, add first section
+    loadScripts() {
+      const script1_1 = require(PREFIX_SCRIPT + 'scene 1.1.json')
+      const script1_2 = require(PREFIX_SCRIPT + 'scene 1.2.json')
+      
+      this.sections.push(script1_1)
+      this.sections.push(script1_2)
     },
   }
 }
@@ -210,72 +88,4 @@ export default {
   color: #ffffff;
   /* margin-top: 60px; */
 }
-
-@media (min-width: 1280px) {
-  .gameBox {
-    width: 1280px
-  }
-}
-
-.wrapper {
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  justify-items: center;
-  display: flex;
-}
-
-.gameBox {
-  width: 100vw;
-  height: 100vh;
-  max-width: calc(100vh * 16 / 10);
-  max-height: 100vh;
-  /* background-image: url('assets/bg.png'); */
-  background-size: calc(100vh * 16 / 10) 100vh;
-  /* background-size: 100% 100%; */
-  background-repeat: no-repeat;
-  border-style: solid;
-}
-
-.showLeft {
-  background-position: left;
-}
-.showRight {
-  background-position: right;
-}
-.showCenter {
-  background-position: center;
-}
-
-.aboveText {
-  height: 70%;
-  border-style: solid;
-  border-color: green;
-  /* background-image: url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'); */
-  background-size: contain,contain,contain;
-  background-repeat: no-repeat,no-repeat,no-repeat;
-  background-position: 5% 100%,center,95% 100%;
-}
-.textBox {
-  height: 30%;
-  border-style: solid;
-  border-color: greenyellow;
-  background-image: url('assets/textbox.jpeg');
-  background-position: left;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  padding-top: 3.5vmin;
-}
-
-.speakerBox {
-  font-size: 3.5vmin;
-  margin: 1vmin;
-}
-.textingBox {
-  width: 100%;
-  font-size: 3vmin;
-  margin-left: 4vmin;
-  padding-right: 5vmin;
-}
-
 </style>
