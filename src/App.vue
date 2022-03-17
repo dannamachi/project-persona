@@ -1,18 +1,24 @@
 <template>
   <div>
     <DialogueFrame v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' />
+    v-bind:sections='sections' @select-option='onSelectOption'/>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue'
+import { reactive, computed } from 'vue'
+
 import DialogueFrame from './frames/DialogueFrame.vue'
 
 const PREFIX_SPRITE = './assets/sprites/'
 const PREFIX_BG = './assets/backgrounds/'
 const PREFIX_UI = './assets/interfaces/'
 const PREFIX_SCRIPT = './assets/scripts/'
+
+const GAME_NAME = "Project Persona"
+const GAME_DEV = "mochipie95"
+
+// const KEY_NICK_MC = 'morelle'
 
 export default {
   name: 'App',
@@ -25,6 +31,36 @@ export default {
         textbox: ''
       },
       images: {},
+
+      // default new bookmark
+      bookmark: {
+        // identifier
+        game_name: GAME_NAME,
+        game_dev: GAME_DEV,
+        game_hash : '',
+
+        // reading progress
+        current_scene: '',
+        current_line: '',
+
+        // auto generated
+        auto: true,
+
+        // divergence
+        name: '',
+        flags: [],
+        choices: {}
+      },
+
+      // list of bookmarks in game (added everytime a new scene is reached, set name then)
+      bookmarks: []
+    }
+  },
+  provide() {
+    return {
+      // explicitly provide a computed property
+      bookmark: computed(() => this.bookmark),
+      bookmarks: computed(() => this.bookmarks)
     }
   },
   setup() {
@@ -37,6 +73,9 @@ export default {
     // for (var pos of this.script.meta__posList) {
     //   if (this.sprite[pos] == null) this.sprite[pos] = ''
     // }
+
+    // load unique game has
+    this.getGameHash()
 
     // load interfaces
     this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
@@ -67,11 +106,26 @@ export default {
 
   },
   methods: {
+    onSelectOption(stuff) {
+      console.log('selected: ' + stuff.option.name)
+      this.bookmark.choices[stuff.scene] = stuff.option
+      // to do: enact the flags
+    },
+    getGameHash() {
+      const sha256 = require('simple-sha256')
+      var scriptString = ''
+      for (var sect of this.sections) {
+        scriptString += sect.meta__id
+      }
+      this.bookmark.game_hash = sha256(scriptString)
+      // console.log(sha256.sync('hey there'))
+    },
     // import all scripts here, add first section
     loadScripts() {
       const script1_1 = require(PREFIX_SCRIPT + 'scene 1.1.json')
       const script1_2 = require(PREFIX_SCRIPT + 'scene 1.2.json')
       
+      // first eligible section will be played first, so order matters
       this.sections.push(script1_1)
       this.sections.push(script1_2)
     },
