@@ -9,20 +9,36 @@
             backgroundImage: 'url(\'' + background + '\')'
         }">
 
-        <div class='container-fluid aboveText' :style="{ 
+        <!-- sprite display -->
+        <div v-if='notChoice' class='container-fluid aboveText' :style="{ 
             backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
             <button @click='toggleShowing("right")'>right</button> -->
-            <button @click='restartScript()'>restart</button>
+            <button v-if='!canAdvance' @click='restartScript()'>restart</button>
             <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
         </div>
+        <!-- if choice -->
+        <div v-else class='container-fluid aboveText d-flex align-items-center'>
+          <div v-for='(option, index) in script.choice.options' :key='index'>
+            <button v-if='isEligibleOption(option)' @click='selectOption(option)'>
+              {{ option.name }}
+            </button>
+          </div>
+        </div>
+
+        <!-- textbox -->
         <div class='container-fluid textBox' @click='advanceText()' :style="{
             backgroundImage: 'url(\'' + ui.textbox + '\')'
             }">
             <p class='text-center speakerBox'>{{ isLoaded() ? getCurrentLine().speaker.name : 'no one' }}</p>
-            <p class='text-start text-wrap text-break textingBox'>{{ isLoaded() ? getCurrentText() : 'nothing at all' }}</p>
+            <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
+              {{ isLoaded() ? getCurrentText() : 'nothing at all' }}
+            </p>
+            <p v-else class='text-start text-wrap text-break textingBox'>
+              {{ script.choice.prompt }}
+            </p>
         </div>
 
         </div>
@@ -36,6 +52,7 @@ export default {
         'ui', 'images',
         'sections'
   ],
+  inject: ['bookmark'],
   data() {
     return {
         sprite: {
@@ -51,10 +68,10 @@ export default {
             sceneName: null,
             lineName: null
         },
-        canAdvance: false,
+        canAdvance: true,
         background: '',
         script: {},
-        sectionIndex : 0
+        notChoice: true
     }
   },
   created() {
@@ -63,12 +80,10 @@ export default {
   },
   methods: {
     restartScript() {
-      // first section
-      this.sectionIndex = 0
-      this.script = this.sections[this.sectionIndex]
+      // first eligible section
+      this.script = this.getFirstSection()
       // first scene
       this.dialogue.sceneName = this.script.meta__startName.slice(7)
-      this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
       this.loadScene()
       this.canAdvance = true
     },
@@ -81,6 +96,104 @@ export default {
     getCurrentLine() {
       return this.script['scene__' + this.dialogue.sceneName]['line__' + this.dialogue.lineName]
     },
+    getFirstSection() {
+      for (var i=0; i<this.sections.length; i++) {
+        if (this.isEligibleSection(this.sections[i])) {
+          return this.sections[i]
+        }
+      }
+      return null
+    },
+    getNextSection() {
+      for (var sect of this.sections) {
+        if (sect.meta__id != this.script.meta__id && sect.meta__previous == this.script.meta__id) {
+          if (this.isEligibleSection(sect)) return sect
+        }
+      }
+      return null
+    },
+    getNextScene(nextScene) {
+      if (nextScene == '' || nextScene == null) return null
+      else {
+        if (this.isEligibleScene(nextScene)) return nextScene
+        else return this.getNextScene(this.script['scene__' + nextScene].next)
+      }
+    },
+
+    isEligibleScene(sceneName) {
+      var scn = this.script['scene__' + sceneName]
+      for (var flag of scn.meta__flagRList) {
+        if (!this.isFlagFulfilled(flag)) return false
+      }
+      return true
+    },
+    isEligibleSection(sect) {
+      for (var flag of sect.meta__flagList) {
+        if (!this.isFlagFulfilled(flag)) return false
+      }
+      return true
+    },
+    isFlagFulfilled(flag) {
+      var ftype = flag.type
+      for (var fl of this.bookmark.flags) {
+        if (fl.name == flag.name) {
+          if (ftype == 'flag' && fl.type == 'flag') {
+            // flag exists, cleared
+            return true
+          } else if (ftype == 'more' && fl.type == 'score') {
+            return fl.score >= flag.score
+          } else if (ftype == 'less' && fl.type == 'score') {
+            return fl.score < flag.score
+          } else if (ftype == 'value' && fl.type == 'value') {
+            return fl.value = flag.value
+          } else if (ftype == 'diff' && fl.type == 'value') {
+            return fl.value != flag.value
+          }
+        }
+      }
+      return false
+    },
+    isEligibleOption(opt) {
+      for (var flag of opt.required) {
+        if (!this.isFlagFulfilled(flag)) return false
+      }
+      return true
+    },
+
+    selectOption(opt) {
+      this.$emit('selectOption', {
+        scene: this.getCurrentScene().meta__id,
+        option: opt
+      })
+      this.notChoice = true
+      this.canAdvance = true
+      this.advanceSection()
+    },
+    haveChoice() {
+      var choice = this.script.choice
+      for (var opt of choice.options) {
+          // TO DO: main dialogue data: saved in App
+          // always have a bookmark loaded/new bookmark created
+          // check if any eligible options
+          if (this.isEligibleOption(opt)) return true
+      }
+      return false
+    },
+
+    advanceSection() {
+      // advance section (to do: add scene/section transition later?)
+      var nextScript = this.getNextSection()
+      // TO DO: enact the flags
+      // check if end game
+      if (nextScript == null) {
+        this.canAdvance = false
+      } else {
+        this.script = nextScript
+        // load scene
+        this.dialogue.sceneName = this.script.meta__startName.slice(7)
+        this.loadScene()
+      }
+    },
     advanceText() {
       // TO DO: add next section, choice check !
       if (this.isLoaded() && this.canAdvance) {
@@ -89,18 +202,18 @@ export default {
           // check if section end
           if (this.script.meta__endName == 'scene__' + this.dialogue.sceneName || this.getCurrentScene().next == '') {
             // check if choice
-
-            // if (this.script.choice) {
-              
-            // } else {
-            //   // end story
-            //   this.canAdvance = false
-            // }
+            if (this.haveChoice()) {
+              // to choice
+              this.notChoice = false
+              this.canAdvance = false
+            } else {
+              this.advanceSection()
+            }
           } else {
             // next scene
-            this.dialogue.sceneName = this.getCurrentScene().next
-            this.dialogue.lineName = this.getCurrentScene().meta__startName.slice(6)
+            this.dialogue.sceneName = this.getNextScene(this.getCurrentScene().next)
             this.loadScene()
+            // TO DO: enact the flags
           }
         } else {
           // next line
@@ -112,8 +225,10 @@ export default {
     toggleShowing(thing) {
       if (window.innerWidth < 1000) this.showing = thing
     },
+
     loadScene() {
       var scene = this.getCurrentScene()
+      this.dialogue.lineName = scene.meta__startName.slice(6)
       this.background = this.images['bg_' + scene.background]
     },
     loadSprite() {
@@ -143,7 +258,6 @@ export default {
       }
       return null
     },
-    // TO DO: parse and replace with corresponding nick/pronoun
     parseNick(line, type='n') {
       var startSym = '{@'
       var endSym = '@}'
