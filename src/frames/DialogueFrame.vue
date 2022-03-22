@@ -11,7 +11,7 @@
 
         <!-- sprite display -->
         <div v-if='notChoice' class='container-fluid aboveText' :style="{ 
-            backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.player + '\')'
+            backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.right + '\')'
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- textbox -->
-        <div class='container-fluid textBox' @click='advanceText()' :style="{
+        <div class='container-fluid textBox float-end' @click='advanceText()' :style="{
             backgroundImage: 'url(\'' + ui.textbox + '\')'
             }">
             <!-- to do: fix textbox shift when empty speaker -->
@@ -45,6 +45,11 @@
             <p v-else class='text-start text-wrap text-break textingBox'>
               {{ script.choice.prompt }}
             </p>
+        </div>
+<!-- backgroundImage: 'url(\'' + sprite.player + '\')' -->
+        <!-- mc box -->
+        <div class='position-absolute bottom-0 start-0'>
+          <img v-if='sprite.player != ""' :src='sprite.player' width='200' height='250'/>
         </div>
 
         </div>
@@ -358,6 +363,7 @@ export default {
   background-position: 5% 100%,center,95% 100%;
 }
 .textBox {
+  width: 80%;
   height: 30%;
   border-style: solid;
   border-color: greenyellow;
