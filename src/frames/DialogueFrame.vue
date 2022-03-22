@@ -21,12 +21,16 @@
         </div>
         <!-- if choice -->
         <!-- to do: choice in column -->
-        <div v-else class='container-fluid aboveText d-flex align-items-center justify-content-end'>
-          <div v-for='(option, index) in script.choice.options' :key='index'>
-            <button v-if='isEligibleOption(option)' @click='selectOption(option)'>
+        <div v-else class='container-fluid aboveText pt-5'>
+            
+          <div v-for='(option, index) in script.choice.options' :key='index' class='my-5 row justify-content-end'>
+            <div class='col'>
+            <p class='fs-3 btn-link text-end' v-if='isEligibleOption(option)' @click='selectOption(option)'>
               {{ option.name }}
-            </button>
+            </p>
+            </div>
           </div>
+  
         </div>
 
         <!-- textbox -->
