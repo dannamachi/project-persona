@@ -20,7 +20,8 @@
             <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
         </div>
         <!-- if choice -->
-        <div v-else class='container-fluid aboveText d-flex align-items-center'>
+        <!-- to do: choice in column -->
+        <div v-else class='container-fluid aboveText d-flex align-items-center justify-content-end'>
           <div v-for='(option, index) in script.choice.options' :key='index'>
             <button v-if='isEligibleOption(option)' @click='selectOption(option)'>
               {{ option.name }}
@@ -32,7 +33,8 @@
         <div class='container-fluid textBox' @click='advanceText()' :style="{
             backgroundImage: 'url(\'' + ui.textbox + '\')'
             }">
-            <p class='text-center speakerBox'>{{ isLoaded() ? getCurrentLine().speaker.name : 'no one' }}</p>
+            <!-- to do: fix textbox shift when empty speaker -->
+            <p class='text-center speakerBox'>{{ isLoaded() ? getSpeakerName() : 'no one' }}</p>
             <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
               {{ isLoaded() ? getCurrentText() : 'nothing at all' }}
             </p>
@@ -95,6 +97,11 @@ export default {
     },
     getCurrentLine() {
       return this.script['scene__' + this.dialogue.sceneName]['line__' + this.dialogue.lineName]
+    },
+    getSpeakerName() {
+      var speaker = this.getCurrentLine().speaker
+      if (speaker.keyName == '__narrator') return ''
+      else return speaker.name
     },
     getFirstSection() {
       for (var i=0; i<this.sections.length; i++) {
@@ -360,6 +367,7 @@ export default {
 .speakerBox {
   font-size: 3.5vmin;
   margin: 1vmin;
+  height: 20%;
 }
 .textingBox {
   width: 100%;
