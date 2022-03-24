@@ -23,9 +23,9 @@
         <!-- to do: choice in column -->
         <div v-else class='container-fluid aboveText pt-5'>
             
-          <div v-for='(option, index) in script.choice.options' :key='index' class='my-5 row justify-content-end'>
+          <div v-for='(option, index) in getEligibleOptions()' :key='index' class='my-5 row justify-content-end'>
             <div class='col'>
-            <p class='fs-3 btn-link text-end' v-if='isEligibleOption(option)' @click='selectOption(option)'>
+            <p class='fs-3 btn-link text-end' @click='selectOption(option)'>
               {{ option.name }}
             </p>
             </div>
@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import { hasFlags } from '../utils/flags'
+
 export default {
   name: 'DialogueFrame',
   props: [
@@ -101,6 +103,8 @@ export default {
     isLoaded() {
       return this.dialogue.sceneName && this.dialogue.lineName
     },
+    getFlags() { return this.bookmark.flags },
+
     getCurrentScene() {
       return this.script['scene__' + this.dialogue.sceneName]
     },
@@ -114,16 +118,14 @@ export default {
     },
     getFirstSection() {
       for (var i=0; i<this.sections.length; i++) {
-        if (this.isEligibleSection(this.sections[i])) {
-          return this.sections[i]
-        }
+        if (hasFlags(this.getFlags(), this.sections[i].meta__flagList)) return this.sections[i]
       }
       return null
     },
     getNextSection() {
       for (var sect of this.sections) {
         if (sect.meta__id != this.script.meta__id && sect.meta__previous == this.script.meta__id) {
-          if (this.isEligibleSection(sect)) return sect
+          if (hasFlags(this.getFlags(), sect.meta__flagList)) return sect
         }
       }
       return null
@@ -131,25 +133,19 @@ export default {
     getNextScene(nextScene) {
       if (nextScene == '' || nextScene == null) return null
       else {
-        if (this.isEligibleScene(nextScene)) return nextScene
+        if (hasFlags(this.getFlags(), this.script['scene__' + nextScene].meta__flagRList)) return nextScene
         else return this.getNextScene(this.script['scene__' + nextScene].next)
       }
     },
+    getEligibleOptions() {
+      var options = []
+      for (var opt of this.script.choice.options) {
+        if (hasFlags(this.getFlags(), opt.required)) options.push(opt)
+      }
+      return options;
+    },
 
-    isEligibleScene(sceneName) {
-      var scn = this.script['scene__' + sceneName]
-      for (var flag of scn.meta__flagRList) {
-        if (!this.isFlagFulfilled(flag)) return false
-      }
-      return true
-    },
-    isEligibleSection(sect) {
-      for (var flag of sect.meta__flagList) {
-        if (!this.isFlagFulfilled(flag)) return false
-      }
-      return true
-    },
-    isFlagFulfilled(flag) {
+    /*isFlagFulfilled(flag) {
       var ftype = flag.type
       for (var fl of this.bookmark.flags) {
         if (fl.name == flag.name) {
@@ -168,17 +164,11 @@ export default {
         }
       }
       return false
-    },
-    isEligibleOption(opt) {
-      for (var flag of opt.required) {
-        if (!this.isFlagFulfilled(flag)) return false
-      }
-      return true
-    },
+    },*/
 
     selectOption(opt) {
       this.$emit('selectOption', {
-        scene: this.getCurrentScene().meta__id,
+        section: this.script.meta__id,
         option: opt
       })
       this.notChoice = true
@@ -191,7 +181,7 @@ export default {
           // TO DO: main dialogue data: saved in App
           // always have a bookmark loaded/new bookmark created
           // check if any eligible options
-          if (this.isEligibleOption(opt)) return true
+          if (hasFlags(this.getFlags(), opt.required)) return true;
       }
       return false
     },

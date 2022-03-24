@@ -7,6 +7,7 @@
 
 <script>
 import { reactive, computed } from 'vue'
+import { setFlag } from './utils/flags'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
 
@@ -108,8 +109,11 @@ export default {
   methods: {
     onSelectOption(stuff) {
       console.log('selected: ' + stuff.option.name)
-      this.bookmark.choices[stuff.scene] = stuff.option
+      this.bookmark.choices[stuff.section] = stuff.option
       // to do: enact the flags
+      for (var flag of stuff.option.giving) {
+        this.bookmark.flags = setFlag(this.bookmark.flags, flag)
+      }
     },
     getGameHash() {
       const sha256 = require('simple-sha256')
