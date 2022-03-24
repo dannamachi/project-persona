@@ -1,7 +1,7 @@
 <template>
   <div>
     <DialogueFrame v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' @select-option='onSelectOption'/>
+    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags'/>
   </div>
 </template>
 
@@ -107,14 +107,24 @@ export default {
 
   },
   methods: {
+    onSetFlags(stuff) {
+      this.setFlags(stuff.flags)
+    },
     onSelectOption(stuff) {
       console.log('selected: ' + stuff.option.name)
       this.bookmark.choices[stuff.section] = stuff.option
-      // to do: enact the flags
-      for (var flag of stuff.option.giving) {
+      // enact the flags
+      this.setFlags(stuff.option.giving)
+    },
+
+    setFlags(flags) {
+      // enact the flags
+      for (var flag of flags) {
         this.bookmark.flags = setFlag(this.bookmark.flags, flag)
       }
+      // console.log(this.bookmark.flags)
     },
+
     getGameHash() {
       const sha256 = require('simple-sha256')
       var scriptString = ''

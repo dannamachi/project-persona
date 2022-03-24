@@ -95,6 +95,7 @@ export default {
     restartScript() {
       // first eligible section
       this.script = this.getFirstSection()
+      this.setFlags(this.script.meta__flagGList)
       // first scene
       this.dialogue.sceneName = this.script.meta__startName.slice(7)
       this.loadScene()
@@ -189,19 +190,21 @@ export default {
     advanceSection() {
       // advance section (to do: add scene/section transition later?)
       var nextScript = this.getNextSection()
-      // TO DO: enact the flags
+
       // check if end game
       if (nextScript == null) {
         this.canAdvance = false
       } else {
         this.script = nextScript
+        // TO DO: enact the flags
+        this.setFlags(this.script.meta__flagGList)
         // load scene
         this.dialogue.sceneName = this.script.meta__startName.slice(7)
         this.loadScene()
       }
     },
     advanceText() {
-      // TO DO: add next section, choice check !
+      // add next section, choice check !
       if (this.isLoaded() && this.canAdvance) {
         // check if scene end
         if (this.getCurrentScene().meta__endName == 'line__' + this.dialogue.lineName || this.getCurrentLine().next == '') {
@@ -219,7 +222,6 @@ export default {
             // next scene
             this.dialogue.sceneName = this.getNextScene(this.getCurrentScene().next)
             this.loadScene()
-            // TO DO: enact the flags
           }
         } else {
           // next line
@@ -231,11 +233,16 @@ export default {
     toggleShowing(thing) {
       if (window.innerWidth < 1000) this.showing = thing
     },
+    setFlags(flags) {
+      this.$emit('setFlags', {flags: flags})
+    },
 
     loadScene() {
       var scene = this.getCurrentScene()
       this.dialogue.lineName = scene.meta__startName.slice(6)
       this.background = this.images['bg_' + scene.background]
+      // to do: enact the flags
+      this.setFlags(scene.meta__flagList)
     },
     loadSprite() {
       // clear display

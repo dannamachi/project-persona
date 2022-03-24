@@ -4,8 +4,8 @@
 const isOfFlagType = (flag, ft) => {
     switch (ft) {
         case "flag": return flag.type == 'flag';
-        case "score": return flag.type in ['score', 'inc', 'dec', 'more', 'less'];
-        case "value": return flag.type in ['value', 'diff']
+        case "score": return ['score', 'inc', 'dec', 'more', 'less'].includes(flag.type);
+        case "value": return ['value', 'diff'].includes(flag.type)
     }
     return false
 }
@@ -38,10 +38,10 @@ const setFlag = (flags, flagToSet) => {
         if (isEqualFlag(fl, flagToSet)) {
             if (isOfFlagType(flagToSet, "score")) flags[i] = updateScoreFlag(fl, flagToSet, flagToSet.type)
             else if (isOfFlagType(flagToSet, "value")) flags[i] = updateValueFlag(fl, flagToSet)
-            else if (isOfFlagType(flagToSet, "flag")) hasFlag = true
+            hasFlag = true
         }
     }
-    if (isOfFlagType(flagToSet, "flag") && !hasFlag) {
+    if (!hasFlag) {
         flags.push(flagToSet)
     }
     return flags;
@@ -94,7 +94,7 @@ const hasFlags = (flags, requiredList) => {
 }
 
 const isEqualFlag = (flag1, flag2) => {
-    if (flag1.name != flag2.name) return false
+    if (flag1.name != flag2.name) { return false }
     for (var ft of ["flag", "score", "value"]) {
         if (isOfFlagType(flag1, ft) && isOfFlagType(flag2, ft)) return true;
     }
