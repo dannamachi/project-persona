@@ -325,42 +325,6 @@ export default {
 </script>
 
 <style scoped>
-@media (min-width: 1280px) {
-  .gameBox {
-    width: 1280px
-  }
-}
-
-.wrapper {
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  justify-items: center;
-  display: flex;
-}
-
-.gameBox {
-  width: 100vw;
-  height: 100vh;
-  max-width: calc(100vh * 16 / 10);
-  max-height: 100vh;
-  /* background-image: url('assets/bg.png'); */
-  background-size: calc(100vh * 16 / 10) 100vh;
-  /* background-size: 100% 100%; */
-  background-repeat: no-repeat;
-  border-style: solid;
-}
-
-.showLeft {
-  background-position: left;
-}
-.showRight {
-  background-position: right;
-}
-.showCenter {
-  background-position: center;
-}
-
 .aboveText {
   height: 70%;
   border-style: solid;
