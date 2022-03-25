@@ -20,7 +20,7 @@
             <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
         </div>
         <!-- if choice -->
-        <!-- to do: choice in column -->
+        <!-- choice in column -->
         <div v-else class='container-fluid aboveText pt-5'>
             
           <div v-for='(option, index) in getEligibleOptions()' :key='index' class='my-5 row justify-content-end'>
@@ -37,7 +37,7 @@
         <div class='container-fluid textBox float-end' @click='advanceText()' :style="{
             backgroundImage: 'url(\'' + ui.textbox + '\')'
             }">
-            <!-- to do: fix textbox shift when empty speaker -->
+            <!-- fix textbox shift when empty speaker -->
             <p class='text-center speakerBox'>{{ isLoaded() ? getSpeakerName() : 'no one' }}</p>
             <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
               {{ isLoaded() ? getCurrentText() : 'nothing at all' }}
@@ -179,7 +179,7 @@ export default {
     haveChoice() {
       var choice = this.script.choice
       for (var opt of choice.options) {
-          // TO DO: main dialogue data: saved in App
+          // main dialogue data: saved in App
           // always have a bookmark loaded/new bookmark created
           // check if any eligible options
           if (hasFlags(this.getFlags(), opt.required)) return true;
@@ -196,7 +196,7 @@ export default {
         this.canAdvance = false
       } else {
         this.script = nextScript
-        // TO DO: enact the flags
+        // enact the flags
         this.setFlags(this.script.meta__flagGList)
         // load scene
         this.dialogue.sceneName = this.script.meta__startName.slice(7)
@@ -236,13 +236,22 @@ export default {
     setFlags(flags) {
       this.$emit('setFlags', {flags: flags})
     },
+    emitProgress() {
+      this.$emit('passProgress', {
+        section: this.script.meta__id,
+        scene: this.getCurrentScene().keyName,
+        line: this.getCurrentLine().keyName
+      })
+    },
 
     loadScene() {
       var scene = this.getCurrentScene()
       this.dialogue.lineName = scene.meta__startName.slice(6)
       this.background = this.images['bg_' + scene.background]
-      // to do: enact the flags
+      // enact the flags
       this.setFlags(scene.meta__flagList)
+      // load first line
+      this.loadSprite()
     },
     loadSprite() {
       // clear display
@@ -258,6 +267,8 @@ export default {
           this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
         }
       }
+      // emit progress
+      this.emitProgress()
     },
     getCurrentText() {
       var text = this.parseNick(this.parseNick(this.getCurrentLine().text), 'p')
