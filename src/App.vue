@@ -1,12 +1,13 @@
 <template>
   <div>
     <DialogueFrame v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags'/>
+    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress'/>
   </div>
 </template>
 
 <script>
 import { reactive, computed } from 'vue'
+import SHA256 from 'sha256-es';
 import { setFlag } from './utils/flags'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -41,6 +42,7 @@ export default {
         game_hash : '',
 
         // reading progress
+        current_section: '',
         current_scene: '',
         current_line: '',
 
@@ -107,6 +109,11 @@ export default {
 
   },
   methods: {
+    onEmitProgress(stuff) {
+      this.bookmark.current_section = stuff.section
+      this.bookmark.current_scene = stuff.scene
+      this.bookmark.current_line = stuff.line
+    },
     onSetFlags(stuff) {
       this.setFlags(stuff.flags)
     },
@@ -126,12 +133,13 @@ export default {
     },
 
     getGameHash() {
-      const sha256 = require('simple-sha256')
       var scriptString = ''
       for (var sect of this.sections) {
         scriptString += sect.meta__id
       }
-      this.bookmark.game_hash = sha256(scriptString)
+      this.bookmark.game_hash = SHA256.hash(scriptString)
+      console.log(this.bookmark.game_hash)
+
       // console.log(sha256.sync('hey there'))
     },
     // import all scripts here, add first section
