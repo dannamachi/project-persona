@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- main frame -->
-    <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink()'/>
+    <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-if='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress'/>
+    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress' :key='toggleReload'/>
 
     <!-- side menu for navigation -->
     <div class='position-absolute top-50 start-0'>
@@ -21,7 +21,8 @@
       </div>
       <div class="offcanvas-body">
         <ActionButton v-bind:actionType='getButtonActionType()' />
-        <div class="dropdown mt-3">
+        <button type="button" class="btn btn-warning" @click='onRestartGame()'>Restart</button>
+        <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button
           </button>
@@ -30,7 +31,7 @@
             <li><a class="dropdown-item" href="#">Another action</a></li>
             <li><a class="dropdown-item" href="#">Something else here</a></li>
           </ul>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -70,31 +71,15 @@ export default {
   data() {
     return {
       frame: FRAME_TITLE,
+      toggleReload: false,
       ui: {
         textbox: ''
       },
       images: {},
 
       // default new bookmark
-      bookmark: {
-        // identifier
-        game_name: GAME_NAME,
-        game_dev: GAME_DEV,
-        game_hash : '',
-
-        // reading progress
-        current_section: '',
-        current_scene: '',
-        current_line: '',
-
-        // auto generated
-        auto: true,
-
-        // divergence
-        name: '',
-        flags: [],
-        choices: {}
-      },
+      bookmark: {},
+      game_hash: '',
 
       // list of bookmarks in game (added everytime a new scene is reached, set name then)
       bookmarks: []
@@ -118,8 +103,10 @@ export default {
     //   if (this.sprite[pos] == null) this.sprite[pos] = ''
     // }
 
-    // load unique game has
+    // create unique game hash
     this.getGameHash()
+    // create new bookmark
+    this.restartBookmark()
 
     // load interfaces
     this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
@@ -150,10 +137,17 @@ export default {
 
   },
   methods: {
+    reloadDialogue() {
+      this.toggleReload = !this.toggleReload
+    },
     isOfFrame(frameStr) {
       if (frameStr == "dialogue") return this.getCurrentFrame() == FRAME_DIALOGUE
       else if (frameStr == "title") return this.getCurrentFrame() == FRAME_TITLE
       return false
+    },
+    switchFrame(frameStr) {
+      if (frameStr == "dialogue") this.frame = FRAME_DIALOGUE
+      else if (frameStr == "title") this.frame = FRAME_TITLE
     },
     getCurrentFrame() {
       return this.frame;
@@ -164,10 +158,16 @@ export default {
       return "none"
     },
     
-    onQuickLink(linkStr) {
-      if (linkStr == "start") {
+    onRestartGame() {
         // to dialogue frame, new game
         this.restartBookmark()
+        this.reloadDialogue()
+        this.switchFrame("dialogue")
+        console.log(this.bookmark.flags)
+    },
+    onQuickLink(linkStr) {
+      if (linkStr == "start") {
+        this.onRestartGame()
       } else if (linkStr == "load") {
         // to load modal
       }
@@ -176,6 +176,7 @@ export default {
       this.bookmark.current_section = stuff.section
       this.bookmark.current_scene = stuff.scene
       this.bookmark.current_line = stuff.line
+      // console.log(this.bookmark.flags)
     },
     onSetFlags(stuff) {
       this.setFlags(stuff.flags)
@@ -200,15 +201,34 @@ export default {
       for (var sect of this.sections) {
         scriptString += sect.meta__id
       }
-      this.bookmark.game_hash = SHA256.hash(scriptString)
-      console.log(this.bookmark.game_hash)
+      this.game_hash = SHA256.hash(scriptString)
+      console.log(this.game_hash)
 
       // console.log(sha256.sync('hey there'))
     },
 
     // restart bookmark
     restartBookmark() {
+      // default new bookmark
+      this.bookmark = {
+        // identifier
+        game_name: GAME_NAME,
+        game_dev: GAME_DEV,
+        game_hash : this.game_hash,
 
+        // reading progress
+        current_section: '',
+        current_scene: '',
+        current_line: '',
+
+        // auto generated
+        auto: true,
+
+        // divergence
+        name: '',
+        flags: [],
+        choices: {}
+      }
     },
     // import all scripts here, add first section
     loadScripts() {
