@@ -1,5 +1,6 @@
 // const SETTER_FLAGS = ['flag', 'score', 'value', 'inc', 'dec']
 // const REQ_FLAGS = ['flag', 'score', 'value', 'more', 'less', 'diff']
+import clone from 'just-clone'
 
 const isOfFlagType = (flag, ft) => {
     switch (ft) {
@@ -42,7 +43,7 @@ const setFlag = (flags, flagToSet) => {
         }
     }
     if (!hasFlag) {
-        flags.push(flagToSet)
+        flags.push(clone(flagToSet))
     }
     return flags;
 }
