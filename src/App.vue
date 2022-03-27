@@ -1,7 +1,8 @@
 <template>
   <div>
     <!-- main frame -->
-    <DialogueFrame v-bind:ui='ui' v-bind:images='images'
+    <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink()'/>
+    <DialogueFrame v-if='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress'/>
 
     <!-- side menu for navigation -->
@@ -19,9 +20,7 @@
         <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
-        <div>
-          Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.
-        </div>
+        <ActionButton v-bind:actionType='getButtonActionType()' />
         <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button
@@ -43,6 +42,8 @@ import SHA256 from 'sha256-es';
 import { setFlag } from './utils/flags'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
+import TitleFrame from './frames/TitleFrame.vue'
+import ActionButton from './components/ActionButton.vue'
 
 const PREFIX_SPRITE = './assets/sprites/'
 const PREFIX_BG = './assets/backgrounds/'
@@ -52,15 +53,23 @@ const PREFIX_SCRIPT = './assets/scripts/'
 const GAME_NAME = "Project Persona"
 const GAME_DEV = "mochipie95"
 
+const FRAME_TITLE = 'TITLE FRAME'
+const FRAME_DIALOGUE = "DIALOGUE FRAME"
+// const FRAME_FLOWCHART = "FLOWCHART FRAME"
+// const FRAME_PROFILE = "PROFILE FRAME"
+
 // const KEY_NICK_MC = 'morelle'
 
 export default {
   name: 'App',
   components: {
-    DialogueFrame
+    DialogueFrame,
+    TitleFrame,
+    ActionButton
   },
   data() {
     return {
+      frame: FRAME_TITLE,
       ui: {
         textbox: ''
       },
@@ -141,6 +150,28 @@ export default {
 
   },
   methods: {
+    isOfFrame(frameStr) {
+      if (frameStr == "dialogue") return this.getCurrentFrame() == FRAME_DIALOGUE
+      else if (frameStr == "title") return this.getCurrentFrame() == FRAME_TITLE
+      return false
+    },
+    getCurrentFrame() {
+      return this.frame;
+    },
+    getButtonActionType() {
+      if (this.isOfFrame('dialogue')) return "save"
+      else if (this.isOfFrame('title')) return "load"
+      return "none"
+    },
+    
+    onQuickLink(linkStr) {
+      if (linkStr == "start") {
+        // to dialogue frame, new game
+        this.restartBookmark()
+      } else if (linkStr == "load") {
+        // to load modal
+      }
+    },
     onEmitProgress(stuff) {
       this.bookmark.current_section = stuff.section
       this.bookmark.current_scene = stuff.scene
@@ -173,6 +204,11 @@ export default {
       console.log(this.bookmark.game_hash)
 
       // console.log(sha256.sync('hey there'))
+    },
+
+    // restart bookmark
+    restartBookmark() {
+
     },
     // import all scripts here, add first section
     loadScripts() {
