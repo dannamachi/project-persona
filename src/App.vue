@@ -21,7 +21,7 @@
       </div>
       <div class="offcanvas-body">
         <ActionButton v-bind:actionType='getButtonActionType()' />
-        <button type="button" class="btn btn-warning" @click='onRestartGame()'>Restart</button>
+        <button type="button" class="mt-2 btn btn-warning" @click='onRestartGame()'>Restart</button>
         <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button

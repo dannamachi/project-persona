@@ -12,7 +12,7 @@
 
                 <div class='my-5 row justify-content-end'>
                     <div class='col'>
-                        <p class='fs-3 btn-primary text-end' @click='quickLinkTo("start")'>
+                        <p class='fs-3 btn-link text-end' @click='quickLinkTo("start")'>
                             Start
                         </p>
                     </div>
@@ -20,7 +20,7 @@
 
                 <div class='my-5 row justify-content-end'>
                     <div class='col'>
-                        <p class='fs-3 btn-primary text-end' @click='quickLinkTo("load")'>
+                        <p class='fs-3 btn-link text-end' @click='quickLinkTo("load")'>
                             Load
                         </p>
                     </div>
