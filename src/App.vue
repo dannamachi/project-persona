@@ -2,7 +2,7 @@
   <div>
     <!-- main frame -->
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
-    <DialogueFrame v-if='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
+    <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress' :key='toggleReload'/>
 
     <!-- side menu for navigation -->
@@ -21,7 +21,14 @@
       </div>
       <div class="offcanvas-body">
         <ActionButton v-bind:actionType='getButtonActionType()' />
-        <button type="button" class="mt-2 btn btn-warning" @click='onRestartGame()'>Restart</button>
+        <button type="button" class="mt-2 mb-2 btn btn-warning" @click='onRestartGame()'>Restart</button>
+        <!-- navigation -->
+        <div>
+          <button type='button' class='btn btn-link' @click='switchFrame("dialogue")'>Resume</button>
+        </div>
+        <div>
+          <button type='button' class='btn btn-link' @click='switchFrame("title")'>Title</button>
+        </div>
         <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button
