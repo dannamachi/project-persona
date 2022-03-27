@@ -15,8 +15,8 @@
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
-            <button @click='toggleShowing("right")'>right</button> -->
-            <button v-if='!canAdvance' @click='restartScript()'>restart</button>
+            <button @click='toggleShowing("right")'>right</button>
+            <button v-if='!canAdvance' @click='restartScript()'>restart</button> -->
             <!-- {{ isLoaded() ? getCurrentScene().keyName : '' }} -->
         </div>
         <!-- if choice -->
@@ -100,6 +100,7 @@ export default {
       this.dialogue.sceneName = this.script.meta__startName.slice(7)
       this.loadScene()
       this.canAdvance = true
+      this.emitProgress()
     },
     isLoaded() {
       return this.dialogue.sceneName && this.dialogue.lineName
