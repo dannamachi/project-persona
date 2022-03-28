@@ -20,7 +20,7 @@
 
                 <div class='my-5 row justify-content-end'>
                     <div class='col'>
-                        <p class='fs-3 btn-link text-end' @click='quickLinkTo("load")'>
+                        <p class='fs-3 btn-link text-end' data-bs-toggle="modal" data-bs-target="#loadModal" @click='quickLinkTo("load")'>
                             Load
                         </p>
                     </div>

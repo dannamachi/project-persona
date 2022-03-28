@@ -3,10 +3,10 @@
     <!-- main frame -->
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleReload'
+    v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleDialogue'
     @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'/>
 
-    <!-- side menu for navigation -->
+    <!-- button to side menu-->
     <div class='position-absolute top-50 start-0'>
       <img class='mx-3  ' src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
       <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
@@ -14,21 +14,27 @@
       </button> -->
     </div>
 
-
-    <div class="offcanvas offcanvas-start bg-black" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+    <!-- side menu -->
+    <div class="offcanvas offcanvas-start bg-black" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel" :key='toggleSideMenu'>
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="sideMenuLabel">{{ bookmark.game_name }}</h5>
         <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
+        <!-- screen specific action button -->
         <ActionButton v-bind:actionType='getButtonActionType()' @set-bookmark='onSetBookmark'/>
-        <button type="button" class="mt-2 mb-2 btn btn-warning" @click='onRestartGame()'>Restart</button>
+        <!-- restart button -->
+        <button type="button" class="mt-2 mb-2 btn btn-warning" data-bs-dismiss="offcanvas" @click='onRestartGame()'>Restart</button>
+        <!-- load button -->
+        <div>
+          <button type='button' class='mt-2 mb-2 btn bg-white text-black' data-bs-toggle="modal" data-bs-target="#loadModal">Load</button>
+        </div>
         <!-- navigation -->
         <div>
-          <button type='button' class='btn btn-link' @click='switchFrame("dialogue")'>Resume</button>
+          <button type='button' class='btn btn-link' data-bs-dismiss="offcanvas" @click='switchFrame("dialogue")'>Resume</button>
         </div>
         <div>
-          <button type='button' class='btn btn-link' @click='switchFrame("title")'>Title</button>
+          <button type='button' class='btn btn-link' data-bs-dismiss="offcanvas" @click='switchFrame("title")'>Title</button>
         </div>
         <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
@@ -42,6 +48,9 @@
         </div> -->
       </div>
     </div>
+
+    <!-- modals -->
+    <LoadModal />
   </div>
 </template>
 
@@ -56,6 +65,7 @@ import { getStartSceneName, getStartLineName } from './utils/script'
 import DialogueFrame from './frames/DialogueFrame.vue'
 import TitleFrame from './frames/TitleFrame.vue'
 import ActionButton from './components/ActionButton.vue'
+import LoadModal from './modals/LoadModal.vue'
 
 const PREFIX_SPRITE = './assets/sprites/'
 const PREFIX_BG = './assets/backgrounds/'
@@ -77,12 +87,14 @@ export default {
   components: {
     DialogueFrame,
     TitleFrame,
-    ActionButton
+    ActionButton,
+    LoadModal
   },
   data() {
     return {
       frame: FRAME_TITLE,
-      toggleReload: false,
+      toggleDialogue: false,
+      toggleSideMenu: false,
       ui: {
         textbox: ''
       },
@@ -173,7 +185,10 @@ export default {
   },
   methods: {
     reloadDialogue() {
-      this.toggleReload = !this.toggleReload
+      this.toggleDialogue = !this.toggleDialogue
+    },
+    reloadSidemenu() {
+      this.toggleSideMenu = !this.toggleSideMenu
     },
     isOfFrame(frameStr) {
       if (frameStr == "dialogue") return this.getCurrentFrame() == FRAME_DIALOGUE
@@ -183,13 +198,14 @@ export default {
     switchFrame(frameStr) {
       if (frameStr == "dialogue") this.frame = FRAME_DIALOGUE
       else if (frameStr == "title") this.frame = FRAME_TITLE
+      this.reloadSidemenu()
     },
     getCurrentFrame() {
       return this.frame;
     },
     getButtonActionType() {
       if (this.isOfFrame('dialogue')) return "save"
-      else if (this.isOfFrame('title')) return "load"
+      else if (this.isOfFrame('title')) return "none"
       return "none"
     },
     
