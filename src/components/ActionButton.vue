@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import clone from 'just-clone';
+
 export default {
     props: ['actionType'],
     data() {
@@ -12,9 +14,20 @@ export default {
             showingButton: true
         }
     },
+    inject: ['bookmarks', 'bookmark'],
     methods: {
+        onSaveBookmark() {
+            // add current bookmark to list
+            this.$emit('setBookmark')
+            // download bookmarks / game data
+            var bm = clone(this.bookmarks)
+            require("downloadjs")(JSON.stringify(bm), bm.game_name + ".json", "text/plain");
+        },
         actionClick() {
-            
+            switch (this.actionType) {
+                case "save":
+                    this.onSaveBookmark()
+            }
         },
         getButtonText() {
             switch (this.actionType) {
