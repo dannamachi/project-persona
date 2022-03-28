@@ -261,6 +261,7 @@ export default {
         scriptString += sect.meta__id
       }
       this.game_hash = SHA256.hash(scriptString)
+      this.bookmarks.game_hash = this.game_hash
       // console.log(this.game_hash)
 
       // console.log(sha256.sync('hey there'))

@@ -20,7 +20,8 @@ export default {
             // add current bookmark to list
             this.$emit('setBookmark')
             // download bookmarks / game data
-            var bm = clone(this.bookmarks)
+            // console.log(this.bookmarks.value)
+            var bm = clone(this.bookmarks.value)
             require("downloadjs")(JSON.stringify(bm), bm.game_name + ".json", "text/plain");
         },
         actionClick() {
