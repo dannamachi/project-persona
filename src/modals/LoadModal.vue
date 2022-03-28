@@ -9,6 +9,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <input name="text" placeholder="paste save file content here..." v-model='inputJSON' />
+                    <button class='mx-2 btn btn-dark' type='button' @click='loadGame()'>Load</button>
+                    <div v-if='errMsg != ""' class="alert alert-danger" role="alert">
+                        {{ errMsg }}
+                    </div>
+                    <div v-if='toggleSuccess' class="alert alert-success" role="alert">
+                        {{ successMsg }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -17,7 +25,44 @@
 
 <script>
 export default {
-    
+    inject: ['bookmarks'],
+    props: ['toggleSuccess'],
+    data() {
+        return {
+            inputJSON: '',
+            errMsg: '',
+            successMsg: 'Success ! Please close this window ^^'
+        }
+    },
+    watch: {
+        inputJSON: function() {
+        this.errMsg = ""
+        }
+    },
+    methods: {
+        validateGameHash(gamedt) {
+            if (gamedt.game_hash) {
+                return gamedt.game_hash == this.bookmarks.value.game_hash;
+            }
+            return false;
+        },
+        loadGame() {
+            try {
+                var gameData = JSON.parse(this.inputJSON)
+                if (!this.validateGameHash(gameData)) {
+                    this.errMsg = 'Invalid save file !'
+                }
+                else {
+                    // emit game data
+                    this.$emit('loadGame', gameData)
+                    this.inputJSON = ''
+                }
+            }
+            catch(err) {
+                this.errMsg = 'Invalid save file !'
+            }
+        }
+    }
 }
 </script>
 

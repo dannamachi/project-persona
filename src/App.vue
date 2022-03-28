@@ -27,7 +27,7 @@
         <button type="button" class="mt-2 mb-2 btn btn-warning" data-bs-dismiss="offcanvas" @click='onRestartGame()'>Restart</button>
         <!-- load button -->
         <div>
-          <button type='button' class='mt-2 mb-2 btn bg-white text-black' data-bs-toggle="modal" data-bs-target="#loadModal">Load</button>
+          <button type='button' class='mt-2 mb-2 btn bg-white text-black' data-bs-toggle="modal" data-bs-target="#loadModal" @click='loadModalSuccess = false'>Load</button>
         </div>
         <!-- navigation -->
         <div>
@@ -50,7 +50,7 @@
     </div>
 
     <!-- modals -->
-    <LoadModal />
+    <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess'/>
   </div>
 </template>
 
@@ -95,6 +95,8 @@ export default {
       frame: FRAME_TITLE,
       toggleDialogue: false,
       toggleSideMenu: false,
+      loadModalSuccess: false,
+
       ui: {
         textbox: ''
       },
@@ -184,6 +186,11 @@ export default {
 
   },
   methods: {
+    onLoadGame(gamedt) {
+      console.log(gamedt)
+      this.loadModalSuccess = true
+    },
+
     reloadDialogue() {
       this.toggleDialogue = !this.toggleDialogue
     },
@@ -247,6 +254,7 @@ export default {
         this.switchFrame("dialogue")
       } else if (linkStr == "load") {
         // to load modal
+        this.loadModalSuccess = false
       }
     },
     onEmitProgress(stuff) {
