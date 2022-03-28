@@ -3,7 +3,8 @@
     <!-- main frame -->
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
-    v-bind:sections='sections' @select-option='onSelectOption' @set-flags='onSetFlags' @pass-progress='onEmitProgress' :key='toggleReload'/>
+    v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleReload'
+    @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'/>
 
     <!-- side menu for navigation -->
     <div class='position-absolute top-50 start-0'>
@@ -20,7 +21,7 @@
         <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
       <div class="offcanvas-body">
-        <ActionButton v-bind:actionType='getButtonActionType()' />
+        <ActionButton v-bind:actionType='getButtonActionType()' @set-bookmark='onSetBookmark'/>
         <button type="button" class="mt-2 mb-2 btn btn-warning" @click='onRestartGame()'>Restart</button>
         <!-- navigation -->
         <div>
@@ -47,7 +48,10 @@
 <script>
 import { reactive, computed } from 'vue'
 import SHA256 from 'sha256-es';
-import { setFlag } from './utils/flags'
+import clone from 'just-clone'
+import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene } from './utils/flags'
+import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection } from './utils/dialogue'
+import { getStartSceneName, getStartLineName } from './utils/script'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
 import TitleFrame from './frames/TitleFrame.vue'
@@ -88,15 +92,37 @@ export default {
       bookmark: {},
       game_hash: '',
 
+      // dialogue
+      dialogue: {
+        sceneName: null,
+        lineName: null
+      },
+      speaker: '',
+      script: {},
+
       // list of bookmarks in game (added everytime a new scene is reached, set name then)
-      bookmarks: []
+      bookmarks: {
+        // identifier
+        game_name: GAME_NAME,
+        game_dev: GAME_DEV,
+        game_hash : '',
+
+        // bookmarks
+        list: [],
+        
+        // divergence
+        name: '',
+      }
     }
   },
   provide() {
     return {
       // explicitly provide a computed property
       bookmark: computed(() => this.bookmark),
-      bookmarks: computed(() => this.bookmarks)
+      bookmarks: computed(() => this.bookmarks),
+      dialogue: computed(() => this.dialogue),
+      speaker: computed(() => this.speaker),
+      script: computed(() => this.script)
     }
   },
   setup() {
@@ -112,8 +138,10 @@ export default {
 
     // create unique game hash
     this.getGameHash()
-    // create new bookmark
+    // restart game
     this.restartBookmark()
+    this.setDialogue(getFirstSection(this.sections, this.bookmark.flags))
+    this.reloadDialogue()
 
     // load interfaces
     this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
@@ -165,16 +193,42 @@ export default {
       return "none"
     },
     
+    onNextScene() {
+      this.dialogue.sceneName = getNextScene(getCurrentScene(this.script, this.dialogue.sceneName).next)
+      this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
+      // to do: load first line
+      this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
+    },
+    onNextLine() {
+      this.dialogue.lineName = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName).next
+    },
+    onNextSection() {
+      var nextScript = getNextSection(this.script, this.sections, this.bookmark.flags)
+      if (nextScript == null) {
+        // end game
+        this.switchFrame("title")
+      } else {
+        this.setDialogue(getNextSection(this.script, this.sections, this.bookmark.flags))
+        this.reloadDialogue()
+      }
+    },
+    onSetBookmark() {
+      // save user created bookmark
+      var bm__c = clone(this.bookmark)
+      bm__c.auto = false
+      this.bookmarks.list.push(bm__c)
+    },
     onRestartGame() {
         // to dialogue frame, new game
         this.restartBookmark()
+        this.setDialogue(getFirstSection(this.sections, this.bookmark.flags))
         this.reloadDialogue()
         this.switchFrame("dialogue")
-        console.log(this.bookmark.flags)
+        // console.log(this.bookmark.flags)
     },
     onQuickLink(linkStr) {
       if (linkStr == "start") {
-        this.onRestartGame()
+        this.switchFrame("dialogue")
       } else if (linkStr == "load") {
         // to load modal
       }
@@ -185,9 +239,7 @@ export default {
       this.bookmark.current_line = stuff.line
       // console.log(this.bookmark.flags)
     },
-    onSetFlags(stuff) {
-      this.setFlags(stuff.flags)
-    },
+
     onSelectOption(stuff) {
       console.log('selected: ' + stuff.option.name)
       this.bookmark.choices[stuff.section] = stuff.option
@@ -214,13 +266,25 @@ export default {
       // console.log(sha256.sync('hey there'))
     },
 
+    // set dialogue
+    setDialogue(section) {
+      // first eligible section
+      //this.script = getFirstSection(this.sections, this.bookmark.flags)
+      this.script = section
+      // enact section flags
+      this.setFlags(getResultFlagsFromScript(this.script))
+      // first scene
+      this.dialogue.sceneName = getStartSceneName(this.script)
+      // enact scene flags
+      this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
+      // first line
+      this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
+    },
     // restart bookmark
     restartBookmark() {
       // default new bookmark
       this.bookmark = {
         // identifier
-        game_name: GAME_NAME,
-        game_dev: GAME_DEV,
         game_hash : this.game_hash,
 
         // reading progress
@@ -232,7 +296,6 @@ export default {
         auto: true,
 
         // divergence
-        name: '',
         flags: [],
         choices: {}
       }
