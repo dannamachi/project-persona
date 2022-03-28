@@ -27,7 +27,7 @@
         <button type="button" class="mt-2 mb-2 btn btn-warning" data-bs-dismiss="offcanvas" @click='onRestartGame()'>Restart</button>
         <!-- load button -->
         <div>
-          <button type='button' class='mt-2 mb-2 btn bg-white text-black' data-bs-toggle="modal" data-bs-target="#loadModal" @click='loadModalSuccess = false'>Load</button>
+          <button type='button' class='mt-2 mb-2 btn bg-white text-black' data-bs-toggle="modal" data-bs-target="#loadModal" @click='loadModalSuccess = false; loadModalError = false'>Load</button>
         </div>
         <!-- navigation -->
         <div>
@@ -50,7 +50,7 @@
     </div>
 
     <!-- modals -->
-    <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess' v-bind:toggleError='loadModalError'/>
+    <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess' v-bind:toggleError='loadModalError' />
   </div>
 </template>
 
@@ -59,7 +59,7 @@ import { reactive, computed } from 'vue'
 import SHA256 from 'sha256-es';
 import clone from 'just-clone'
 import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene } from './utils/flags'
-import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection } from './utils/dialogue'
+import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName } from './utils/script'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -188,16 +188,24 @@ export default {
   },
   methods: {
     onLoadGame(gamedt) {
+      this.loadModalSuccess = false
+      this.loadModalError = false
       // validate
       try {
         var gameData = JSON.parse(gamedt)
         if (!this.validateGameHash(gameData)) {
             this.loadModalError = true
         } else {
+          // load the game
+          this.bookmarks = gameData
+          // go to dialogue
+          // console.log(this.bookmarks.list[this.bookmarks.list.length - 1])
+          this.onRestartGame(this.bookmarks.list[this.bookmarks.list.length - 1])
+          // broadcast result
           this.loadModalSuccess = true
-          console.log(gameData)
         }
       } catch (err) {
+        // console.log(err)
         this.loadModalError = true
       }
     },
@@ -258,10 +266,17 @@ export default {
       bm__c.auto = false
       this.bookmarks.list.push(bm__c)
     },
-    onRestartGame() {
+    onRestartGame(bm = null) {
         // to dialogue frame, new game
-        this.restartBookmark()
-        this.setDialogue(getFirstSection(this.sections, this.bookmark.flags))
+        var section;
+        if (!bm) {
+          this.restartBookmark()
+          section = getFirstSection(this.sections, this.bookmark.flags)
+        } else { 
+          this.bookmark = bm
+          section = getSectionByName(this.sections, this.bookmark.current_section)
+        }
+        this.setDialogue(section)
         this.reloadDialogue()
         this.switchFrame("dialogue")
         // console.log(this.bookmark.flags)

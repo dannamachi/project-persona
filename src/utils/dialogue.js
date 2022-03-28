@@ -21,6 +21,13 @@ const getFirstSection = (sections, flags) => {
     return null
 }
 
+const getSectionByName = (sections, sectionName) => {
+  for (var sect of sections) {
+    if (sect.meta__id == sectionName) return sect;
+  }
+  return null
+}
+
 const getNextSection = (script, sections, flags) => {
     for (var sect of sections) {
       if (sect.meta__id != script.meta__id && sect.meta__previous == script.meta__id) {
@@ -112,4 +119,4 @@ const haveChoice = (script, flags) => {
 
 const getChoicePrompt = (script) => { return script.choice.prompt; }
 
-export { getCurrentScene, getCurrentLine, getSpeakerName, getFirstSection, getNextSection, getNextScene, getEligibleOptions, getCurrentText, haveChoice, getChoicePrompt };
+export { getCurrentScene, getCurrentLine, getSpeakerName, getFirstSection, getNextSection, getNextScene, getEligibleOptions, getCurrentText, haveChoice, getChoicePrompt, getSectionByName };

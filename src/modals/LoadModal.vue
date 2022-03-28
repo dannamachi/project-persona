@@ -34,11 +34,6 @@ export default {
             successMsg: 'Success ! Please close this window ^^'
         }
     },
-    watch: {
-        inputJSON: function() {
-            this.$emit('resetSuccess')
-        }
-    },
     methods: {
         validateGameHash(gamedt) {
             if (gamedt.game_hash) {
