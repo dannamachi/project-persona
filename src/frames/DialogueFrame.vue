@@ -139,7 +139,6 @@ export default {
       if (this.isLoaded() && this.canAdvance) {
         // to do: abstract this scene__ and line__ bs
         // check if scene end
-        // TO DO: WHY IS SCENE NAME UNDEFINED
         if (getEndLineName(this.m__getCurrentScene()) == 'line__' + this.getLineName() || this.m__getCurrentLine().next == '') {
           // check if section end
           if (getEndSceneName(this.getScript()) == 'scene__' + this.getSceneName() || this.m__getCurrentScene().next == '') {

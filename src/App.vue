@@ -196,7 +196,7 @@ export default {
     onNextScene() {
       this.dialogue.sceneName = getNextScene(getCurrentScene(this.script, this.dialogue.sceneName).next)
       this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
-      // to do: load first line
+      // load first line
       this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
     },
     onNextLine() {
@@ -261,7 +261,7 @@ export default {
         scriptString += sect.meta__id
       }
       this.game_hash = SHA256.hash(scriptString)
-      console.log(this.game_hash)
+      // console.log(this.game_hash)
 
       // console.log(sha256.sync('hey there'))
     },

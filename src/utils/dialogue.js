@@ -4,7 +4,7 @@ const getCurrentScene = (script, sceneName) => {
     return script['scene__' + sceneName]
 }
 const getCurrentLine = (script, sceneName, lineName) => {
-    console.log(sceneName)
+    // console.log(sceneName)
     return script['scene__' + sceneName]['line__' + lineName]
 }
 
