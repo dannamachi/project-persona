@@ -200,7 +200,7 @@ export default {
           this.bookmarks = gameData
           // go to dialogue
           // console.log(this.bookmarks.list[this.bookmarks.list.length - 1])
-          this.onRestartGame(this.bookmarks.list[this.bookmarks.list.length - 1])
+          this.onReloadGame(this.bookmarks.list[this.bookmarks.list.length - 1])
           // broadcast result
           this.loadModalSuccess = true
         }
@@ -266,20 +266,20 @@ export default {
       bm__c.auto = false
       this.bookmarks.list.push(bm__c)
     },
-    onRestartGame(bm = null) {
+    onRestartGame() {
         // to dialogue frame, new game
-        var section;
-        if (!bm) {
-          this.restartBookmark()
-          section = getFirstSection(this.sections, this.bookmark.flags)
-        } else { 
-          this.bookmark = bm
-          section = getSectionByName(this.sections, this.bookmark.current_section)
-        }
+        this.restartBookmark()
+        var section = getFirstSection(this.sections, this.bookmark.flags)
         this.setDialogue(section)
         this.reloadDialogue()
         this.switchFrame("dialogue")
         // console.log(this.bookmark.flags)
+    },
+    onReloadGame(bm) {
+      this.bookmark = bm
+      this.setDialogueAfterLoad()
+      this.reloadDialogue()
+      this.switchFrame("dialogue")
     },
     onQuickLink(linkStr) {
       if (linkStr == "start") {
@@ -324,6 +324,13 @@ export default {
       // console.log(sha256.sync('hey there'))
     },
 
+    // set dialogue after load
+    setDialogueAfterLoad() {
+      this.script = getSectionByName(this.sections, this.bookmark.current_section)
+      this.dialogue.sceneName = this.bookmark.current_scene
+      this.dialogue.lineName = this.bookmark.current_line
+      // console.log(this.bookmarks.list.length)
+    },
     // set dialogue
     setDialogue(section) {
       // first eligible section
@@ -337,6 +344,15 @@ export default {
       this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
       // first line
       this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
+
+      // set progress
+      this.onEmitProgress({
+        section: section.meta__id,
+        scene: this.dialogue.sceneName,
+        line: this.dialogue.lineName
+      })
+      // auto save section bookmark
+      this.bookmarks.list.push(clone(this.bookmark))
     },
     // restart bookmark
     restartBookmark() {
