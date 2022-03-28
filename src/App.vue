@@ -50,7 +50,7 @@
     </div>
 
     <!-- modals -->
-    <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess'/>
+    <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess' v-bind:toggleError='loadModalError'/>
   </div>
 </template>
 
@@ -96,6 +96,7 @@ export default {
       toggleDialogue: false,
       toggleSideMenu: false,
       loadModalSuccess: false,
+      loadModalError: false,
 
       ui: {
         textbox: ''
@@ -187,10 +188,26 @@ export default {
   },
   methods: {
     onLoadGame(gamedt) {
-      console.log(gamedt)
-      this.loadModalSuccess = true
+      // validate
+      try {
+        var gameData = JSON.parse(gamedt)
+        if (!this.validateGameHash(gameData)) {
+            this.loadModalError = true
+        } else {
+          this.loadModalSuccess = true
+          console.log(gameData)
+        }
+      } catch (err) {
+        this.loadModalError = true
+      }
     },
 
+    validateGameHash(gamedt) {
+      if (gamedt.game_hash) {
+          return gamedt.game_hash == this.game_hash;
+      }
+      return false;
+    },
     reloadDialogue() {
       this.toggleDialogue = !this.toggleDialogue
     },
@@ -255,6 +272,7 @@ export default {
       } else if (linkStr == "load") {
         // to load modal
         this.loadModalSuccess = false
+        this.loadModalError = false
       }
     },
     onEmitProgress(stuff) {

@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <input name="text" placeholder="paste save file content here..." v-model='inputJSON' />
                     <button class='mx-2 btn btn-dark' type='button' @click='loadGame()'>Load</button>
-                    <div v-if='errMsg != ""' class="alert alert-danger" role="alert">
+                    <div v-if='toggleError' class="alert alert-danger" role="alert">
                         {{ errMsg }}
                     </div>
                     <div v-if='toggleSuccess' class="alert alert-success" role="alert">
@@ -26,17 +26,17 @@
 <script>
 export default {
     inject: ['bookmarks'],
-    props: ['toggleSuccess'],
+    props: ['toggleSuccess', 'toggleError'],
     data() {
         return {
             inputJSON: '',
-            errMsg: '',
+            errMsg: 'Invalid save file !',
             successMsg: 'Success ! Please close this window ^^'
         }
     },
     watch: {
         inputJSON: function() {
-        this.errMsg = ""
+            this.$emit('resetSuccess')
         }
     },
     methods: {
@@ -47,20 +47,9 @@ export default {
             return false;
         },
         loadGame() {
-            try {
-                var gameData = JSON.parse(this.inputJSON)
-                if (!this.validateGameHash(gameData)) {
-                    this.errMsg = 'Invalid save file !'
-                }
-                else {
-                    // emit game data
-                    this.$emit('loadGame', gameData)
-                    this.inputJSON = ''
-                }
-            }
-            catch(err) {
-                this.errMsg = 'Invalid save file !'
-            }
+            // emit game data
+            this.$emit('loadGame', this.inputJSON)
+            this.inputJSON = ''
         }
     }
 }
