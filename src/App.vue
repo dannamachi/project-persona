@@ -242,10 +242,11 @@ export default {
     },
     
     onNextScene() {
-      this.dialogue.sceneName = getNextScene(getCurrentScene(this.script, this.dialogue.sceneName).next)
-      this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
+      this.dialogue.sceneName = getNextScene(this.script, this.bookmark.flags, getCurrentScene(this.script, this.dialogue.sceneName).next)
+      var scene = getCurrentScene(this.script, this.dialogue.sceneName)
+      this.setFlags(getResultFlagsFromScene(scene))
       // load first line
-      this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
+      this.dialogue.lineName = getStartLineName(scene)
     },
     onNextLine() {
       this.dialogue.lineName = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName).next
@@ -378,10 +379,12 @@ export default {
     loadScripts() {
       const script1_1 = require(PREFIX_SCRIPT + 'scene 1.1.json')
       const script1_2 = require(PREFIX_SCRIPT + 'scene 1.2.json')
+      const script2_1 = require(PREFIX_SCRIPT + 'scene 2.1.json')
       
       // first eligible section will be played first, so order matters
       this.sections.push(script1_1)
       this.sections.push(script1_2)
+      this.sections.push(script2_1)
     },
   }
 }
