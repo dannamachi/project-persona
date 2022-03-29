@@ -242,11 +242,18 @@ export default {
     },
     
     onNextScene() {
-      this.dialogue.sceneName = getNextScene(this.script, this.bookmark.flags, getCurrentScene(this.script, this.dialogue.sceneName).next)
-      var scene = getCurrentScene(this.script, this.dialogue.sceneName)
-      this.setFlags(getResultFlagsFromScene(scene))
-      // load first line
-      this.dialogue.lineName = getStartLineName(scene)
+      var nextScene = getNextScene(this.script, this.bookmark.flags, getCurrentScene(this.script, this.dialogue.sceneName).next)
+      // if no next eligible scene
+      if (!nextScene) {
+        // to end
+        this.switchFrame("title")
+      } else {
+        this.dialogue.sceneName = nextScene
+        var scene = getCurrentScene(this.script, this.dialogue.sceneName)
+        this.setFlags(getResultFlagsFromScene(scene))
+        // load first line
+        this.dialogue.lineName = getStartLineName(scene)
+      }
     },
     onNextLine() {
       this.dialogue.lineName = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName).next
