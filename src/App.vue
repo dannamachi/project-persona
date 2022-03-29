@@ -58,8 +58,8 @@
 import { reactive, computed } from 'vue'
 import SHA256 from 'sha256-es';
 import clone from 'just-clone'
-import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene } from './utils/flags'
-import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName } from './utils/dialogue'
+import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneEligible } from './utils/flags'
+import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName } from './utils/script'
 
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -310,6 +310,7 @@ export default {
       this.bookmark.choices[stuff.section] = stuff.option
       // enact the flags
       this.setFlags(stuff.option.giving)
+      // console.log(this.bookmark.flags)
     },
 
     setFlags(flags) {
@@ -346,8 +347,13 @@ export default {
       this.script = section
       // enact section flags
       this.setFlags(getResultFlagsFromScript(this.script))
-      // first scene
-      this.dialogue.sceneName = getStartSceneName(this.script)
+      // get first eligible scene ToT
+      var firstscene = getSceneByName(this.script, getStartSceneName(this.script))
+      var firstSceneName = firstscene.keyName
+      if (!isSceneEligible(this.bookmark.flags, firstscene)) {
+        firstSceneName = getNextScene(this.script, this.bookmark.flags, firstscene.next)
+      }
+      this.dialogue.sceneName = firstSceneName
       // enact scene flags
       this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
       // first line

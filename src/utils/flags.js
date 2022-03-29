@@ -102,10 +102,14 @@ const isEqualFlag = (flag1, flag2) => {
     return false;
 }
 
+const isSceneEligible = (flags, scene) => {
+    return hasFlags(flags, getRequiredFlagsFromScene(scene))
+}
+
 const getRequiredFlagsFromScript = (script) => { return script.meta__flagList; }
 const getRequiredFlagsFromScene = (scene) => { return scene.meta__flagRList; }
 const getResultFlagsFromScript = (script) => { return script.meta__flagGList; }
 const getResultFlagsFromScene = (scene) => { return scene.meta__flagList; }
 
 
-export { setFlag, isEqualFlag, hasFlag, hasFlags, getRequiredFlagsFromScene, getResultFlagsFromScript, getResultFlagsFromScene, getRequiredFlagsFromScript };
+export { setFlag, isEqualFlag, hasFlag, hasFlags, getRequiredFlagsFromScene, getResultFlagsFromScript, getResultFlagsFromScene, getRequiredFlagsFromScript, isSceneEligible };
