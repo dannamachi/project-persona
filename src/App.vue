@@ -1,6 +1,7 @@
 <template>
   <div>
     <!-- main frame -->
+    <ProfileFrame v-if='isOfFrame("profile")'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleDialogue'
@@ -36,6 +37,9 @@
         <div>
           <button type='button' class='btn btn-link' data-bs-dismiss="offcanvas" @click='switchFrame("title")'>Title</button>
         </div>
+        <div>
+          <button type='button' class='btn btn-link' data-bs-dismiss="offcanvas" @click='switchFrame("profile")'>Profile</button>
+        </div>
         <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button
@@ -62,6 +66,7 @@ import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneElig
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName } from './utils/script'
 
+import ProfileFrame from './frames/ProfileFrame.vue'
 import DialogueFrame from './frames/DialogueFrame.vue'
 import TitleFrame from './frames/TitleFrame.vue'
 import ActionButton from './components/ActionButton.vue'
@@ -78,13 +83,14 @@ const GAME_DEV = "mochipie95"
 const FRAME_TITLE = 'TITLE FRAME'
 const FRAME_DIALOGUE = "DIALOGUE FRAME"
 // const FRAME_FLOWCHART = "FLOWCHART FRAME"
-// const FRAME_PROFILE = "PROFILE FRAME"
+const FRAME_PROFILE = "PROFILE FRAME"
 
 // const KEY_NICK_MC = 'morelle'
 
 export default {
   name: 'App',
   components: {
+    ProfileFrame,
     DialogueFrame,
     TitleFrame,
     ActionButton,
@@ -225,11 +231,13 @@ export default {
     isOfFrame(frameStr) {
       if (frameStr == "dialogue") return this.getCurrentFrame() == FRAME_DIALOGUE
       else if (frameStr == "title") return this.getCurrentFrame() == FRAME_TITLE
+      else if (frameStr == "profile") return this.getCurrentFrame() == FRAME_PROFILE
       return false
     },
     switchFrame(frameStr) {
       if (frameStr == "dialogue") this.frame = FRAME_DIALOGUE
       else if (frameStr == "title") this.frame = FRAME_TITLE
+      else if (frameStr == "profile") this.frame = FRAME_PROFILE
       this.reloadSidemenu()
     },
     getCurrentFrame() {
