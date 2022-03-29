@@ -380,11 +380,13 @@ export default {
       const script1_1 = require(PREFIX_SCRIPT + 'scene 1.1.json')
       const script1_2 = require(PREFIX_SCRIPT + 'scene 1.2.json')
       const script2_1 = require(PREFIX_SCRIPT + 'scene 2.1.json')
+      const script2_2 = require(PREFIX_SCRIPT + 'scene 2.2.json')
       
       // first eligible section will be played first, so order matters
       this.sections.push(script1_1)
       this.sections.push(script1_2)
       this.sections.push(script2_1)
+      this.sections.push(script2_2)
     },
   }
 }
