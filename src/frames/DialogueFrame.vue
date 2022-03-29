@@ -25,7 +25,7 @@
             
           <div v-for='(option, index) in m__getEligibleOptions()' :key='index' class='my-5 row justify-content-end'>
             <div class='col'>
-            <p class='fs-3 btn-link text-end' @click='selectOption(option)'>
+            <p class='fs-3 bg-black btn-link text-end' @click='selectOption(option)'>
               {{ option.name }}
             </p>
             </div>
