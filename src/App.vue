@@ -203,12 +203,7 @@ export default {
         title: getPlayerTitle(this.sections)
       }
     },
-
-    onUpdateName(player) {
-      console.log(player)
-      // set nicks based on name data for all sections, and in game data
-      this.bookmarks.player = player
-      try {
+    updateName(player) {
         this.sections = setPlayerName(this.sections, player.name)
         this.sections = setPlayerPronoun(this.sections, player.pronoun)
         this.sections = setPlayerPossessive(this.sections, player.possessive)
@@ -216,7 +211,15 @@ export default {
 
         // update isNick speaker as well...
         // static
-        this.sections = setNickableSpeaker(this.sections, 'morelle', player.name)
+        this.sections = setNickableSpeaker(this.sections, 'morelle', player.name) 
+    },
+
+    onUpdateName(player) {
+      console.log(player)
+      // set nicks based on name data for all sections, and in game data
+      this.bookmarks.player = player
+      try {
+        this.updateName(player)
 
         this.nameChangeSuccess = true
         this.nameChangeError = false
@@ -238,6 +241,9 @@ export default {
           // load the game
           this.bookmarks = gameData
           // set nicks based on name data for all sections
+          if (this.bookmarks.player) {
+            this.updateName(this.bookmarks.player)
+          }
           // go to dialogue
           // console.log(this.bookmarks.list[this.bookmarks.list.length - 1])
           this.onReloadGame(this.bookmarks.list[this.bookmarks.list.length - 1])
