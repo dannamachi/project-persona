@@ -64,7 +64,7 @@ import SHA256 from 'sha256-es';
 import clone from 'just-clone'
 import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneEligible } from './utils/flags'
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
-import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle } from './utils/script'
+import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker } from './utils/script'
 
 import ProfileFrame from './frames/ProfileFrame.vue'
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -214,9 +214,14 @@ export default {
         this.sections = setPlayerPossessive(this.sections, player.possessive)
         this.sections = setPlayerTitle(this.sections, player.title)
 
+        // update isNick speaker as well...
+        // static
+        this.sections = setNickableSpeaker(this.sections, 'morelle', player.name)
+
         this.nameChangeSuccess = true
         this.nameChangeError = false
       } catch(e) {
+        console.log(e)
         this.nameChangeError = true
         this.nameChangeSuccess = false
       }

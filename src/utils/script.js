@@ -48,7 +48,7 @@ const getPlayerTitle = (sections) => {
     // static...
     for (var nick of sect.nicks) {
         if (nick.name == "young someone") {
-            return nick.nick
+            return nick.nick.slice(6)
         }
     }
     return null
@@ -110,4 +110,27 @@ const setPlayerTitle = (sections, titleToSet) => {
     return sections
 }
 
-export { getEndSceneName, getStartSceneName, getStartLineName, getEndLineName, getSectionName, getPlayerName, getPlayerTitle, getPlayerPronoun, getPlayerPossessive, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle };
+const setNickableSpeaker = (sections, nickName, newNickValue) => {
+    for (var i=0; i< sections.length; i++) {
+        var sect = sections[i]
+        for (const [key, value] of Object.entries(sect)) {
+            if (key.startsWith('scene__')) {
+                for (const [key1, value1] of Object.entries(value)) {
+                    if (key1.startsWith('line__')) {
+                        if (value1.speaker.isNick && value1.speaker.keyName == nickName) {
+                            sections[i][key][key1].speaker = {
+                                keyName: nickName,
+                                name: newNickValue,
+                                isNick: true,
+                                defaultName: value1.speaker.defaultName
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return sections
+}
+
+export { getEndSceneName, getStartSceneName, getStartLineName, getEndLineName, getSectionName, getPlayerName, getPlayerTitle, getPlayerPronoun, getPlayerPossessive, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker };
