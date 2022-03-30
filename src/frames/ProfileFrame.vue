@@ -15,24 +15,24 @@
                             <!-- input box for player name -->
                             <div class='mt-4'>
                                 <p>Name:</p>
-                                <input type="text" :placeholder='getDefaultPlayerName()' v-model="player.name" maxlength="20" @keypress.enter.prevent />
+                                <input type="text" :placeholder='"<" + playerName.name + ">"' v-model="player.name" maxlength="20" @keypress.enter.prevent />
                             </div>
                             <!-- input box for pronoun (apply to gray as well) -->
                             <div class='mt-4'>
                                 <p>Pronoun:</p>
-                                <input type="text" :placeholder='getDefaultPlayerPronoun()' v-model="player.pronoun" maxlength="20" @keypress.enter.prevent/>
+                                <input type="text" :placeholder='"<" + playerName.pronoun + ">"' v-model="player.pronoun" maxlength="20" @keypress.enter.prevent/>
                             </div>
                         </div>
                         <div class='col-sm-6'>
                             <!-- input box for possessive, to someself as well -->
                             <div class='mt-4'>
                                 <p>Possessive pronoun:</p>
-                                <input type="text" :placeholder='getDefaultPlayerPossessive()' v-model="player.possessive" maxlength="20" @keypress.enter.prevent/>
+                                <input type="text" :placeholder='"<" + playerName.possessive + ">"' v-model="player.possessive" maxlength="20" @keypress.enter.prevent/>
                             </div>
                             <!-- young someone -->
                             <div class='mt-4'>
                                 <p>Title:</p>
-                                <input type="text" :placeholder='getDefaultPlayerTitle()' v-model="player.title" maxlength="20" @keypress.enter.prevent/>
+                                <input type="text" :placeholder='"<" + playerName.title + ">"' v-model="player.title" maxlength="20" @keypress.enter.prevent/>
                             </div>
                         </div>
                     </div>
@@ -40,6 +40,14 @@
                         <!-- button to submit -->
                         <div class='mt-4'>
                             <button type='button' class='btn btn-info' @click='submitNameChange()'>Update</button>
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div v-if='toggleError' class="alert alert-danger" role="alert">
+                            {{ errMsg }}
+                        </div>
+                        <div v-if='toggleSuccess' class="alert alert-success" role="alert">
+                            {{ successMsg }}
                         </div>
                     </div>
                 </div>
@@ -50,6 +58,7 @@
 
 <script>
 export default {
+    props: ['toggleError', 'toggleSuccess', 'playerName'],
     data() {
         return {
             player: {
@@ -57,17 +66,25 @@ export default {
                 pronoun      : '',
                 possessive   : '',
                 title        : ''
-            }
+            },
+            errMsg       : 'Invalid input, please try again...',
+            successMsg   : 'Name updated !'
         }
     },
     methods: {
-        getDefaultPlayerName() { return 'Morelle'; },
-        getDefaultPlayerPronoun() { return 'she'; },
-        getDefaultPlayerPossessive() { return 'her'; },
-        getDefaultPlayerTitle() { return 'miss'; },
-
         submitNameChange() {
-
+            // check empty
+            if (this.player.name.length == 0 || this.player.pronoun.length == 0 || this.player.possessive.length == 0 || this.player.title.length == 0) {
+                this.$emit('emptyAlert')
+                return
+            }
+            this.$emit('nameChange', this.player)
+            this.player = {
+                name         : '',
+                pronoun      : '',
+                possessive   : '',
+                title        : ''
+            }
         }
     }
 }

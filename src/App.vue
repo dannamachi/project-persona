@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- main frame -->
-    <ProfileFrame v-if='isOfFrame("profile")'/>
+    <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleDialogue'
@@ -64,7 +64,7 @@ import SHA256 from 'sha256-es';
 import clone from 'just-clone'
 import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneEligible } from './utils/flags'
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
-import { getStartSceneName, getStartLineName } from './utils/script'
+import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle } from './utils/script'
 
 import ProfileFrame from './frames/ProfileFrame.vue'
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -103,6 +103,8 @@ export default {
       toggleSideMenu: false,
       loadModalSuccess: false,
       loadModalError: false,
+      nameChangeSuccess: false,
+      nameChangeError: false,
 
       ui: {
         textbox: ''
@@ -132,7 +134,7 @@ export default {
         list: [],
         
         // divergence
-        name: '',
+        name: null,
       }
     }
   },
@@ -193,6 +195,32 @@ export default {
 
   },
   methods: {
+    getPlayerNameObject() {
+      return {
+        name: getPlayerName(this.sections),
+        pronoun: getPlayerPronoun(this.sections),
+        possessive: getPlayerPossessive(this.sections),
+        title: getPlayerTitle(this.sections)
+      }
+    },
+
+    onUpdateName(player) {
+      console.log(player)
+      // set nicks based on name data for all sections, and in game data
+      this.bookmarks.player = player
+      try {
+        this.sections = setPlayerName(this.sections, player.name)
+        this.sections = setPlayerPronoun(this.sections, player.pronoun)
+        this.sections = setPlayerPossessive(this.sections, player.possessive)
+        this.sections = setPlayerTitle(this.sections, player.title)
+
+        this.nameChangeSuccess = true
+        this.nameChangeError = false
+      } catch(e) {
+        this.nameChangeError = true
+        this.nameChangeSuccess = false
+      }
+    },
     onLoadGame(gamedt) {
       this.loadModalSuccess = false
       this.loadModalError = false
@@ -204,6 +232,7 @@ export default {
         } else {
           // load the game
           this.bookmarks = gameData
+          // set nicks based on name data for all sections
           // go to dialogue
           // console.log(this.bookmarks.list[this.bookmarks.list.length - 1])
           this.onReloadGame(this.bookmarks.list[this.bookmarks.list.length - 1])
@@ -237,7 +266,11 @@ export default {
     switchFrame(frameStr) {
       if (frameStr == "dialogue") this.frame = FRAME_DIALOGUE
       else if (frameStr == "title") this.frame = FRAME_TITLE
-      else if (frameStr == "profile") this.frame = FRAME_PROFILE
+      else if (frameStr == "profile") {
+        this.nameChangeSuccess = false;
+        this.nameChangeError = false;
+        this.frame = FRAME_PROFILE
+      }
       this.reloadSidemenu()
     },
     getCurrentFrame() {
