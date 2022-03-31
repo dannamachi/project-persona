@@ -190,6 +190,19 @@ export default {
               this.images[value.keyName + "_" + exp] = defaultImg
             }
           }
+        // load moosics
+        } else if (key == 'meta__ostList') {
+          for (var moose of value) {
+            // static none (maybe put this in module ..?)
+            if (moose != 'none') {
+              // assume mp3
+              try {
+                this.osts[moose] = require(PREFIX_MUSIC + moose + '.mp3')
+              } catch (e) {
+                console.log('cannot import music: ' + moose)
+              }
+            }
+          }
         }
       }
 
@@ -200,7 +213,7 @@ export default {
 
     }
 
-    // load moosic
+    // load title moosic
     this.osts.title = require(PREFIX_MUSIC + 'title.mp3')
     // var titleMusic = require('./assets/music/title.mp3')
     // play title music
@@ -209,13 +222,15 @@ export default {
   },
   methods: {
     playMusic(musicStr) {
-      if (this.moosic) this.moosic.fade(0.5, 0)
-      switch (musicStr) {
-        case 'title':
-          this.moosic = getPlayMusic(this.osts.title)
+      if (this.moosic) this.moosic.fade(0.5, 0, 1)
+      this.moosic = null
+      for (const [key, value] of Object.entries(this.osts)) {
+        if (key == musicStr) { 
+          this.moosic = getPlayMusic(value)
           break;
+        }
       }
-      this.moosic.play();
+      if (this.moosic) this.moosic.play();
     },
     getPlayerNameObject() {
       return {
@@ -297,8 +312,14 @@ export default {
       return false
     },
     switchFrame(frameStr) {
-      if (frameStr == "dialogue") this.frame = FRAME_DIALOGUE
-      else if (frameStr == "title") this.frame = FRAME_TITLE
+      if (frameStr == "dialogue") {
+        this.frame = FRAME_DIALOGUE
+        this.playMusic(getCurrentScene(this.script, this.dialogue.sceneName).ost)
+      }
+      else if (frameStr == "title") {
+        this.frame = FRAME_TITLE
+        this.playMusic('title')
+      }
       else if (frameStr == "profile") {
         this.nameChangeSuccess = false;
         this.nameChangeError = false;
@@ -327,6 +348,9 @@ export default {
         this.setFlags(getResultFlagsFromScene(scene))
         // load first line
         this.dialogue.lineName = getStartLineName(scene)
+        // load music
+        console.log(scene.ost)
+        this.playMusic(scene.ost)
       }
     },
     onNextLine() {
