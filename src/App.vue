@@ -62,7 +62,7 @@
 import { reactive, computed } from 'vue'
 import SHA256 from 'sha256-es';
 import clone from 'just-clone'
-import { Howl } from 'howler';
+import { getPlayMusic } from './utils/music'
 import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneEligible } from './utils/flags'
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker } from './utils/script'
@@ -77,6 +77,7 @@ const PREFIX_SPRITE = './assets/sprites/'
 const PREFIX_BG = './assets/backgrounds/'
 const PREFIX_UI = './assets/interfaces/'
 const PREFIX_SCRIPT = './assets/scripts/'
+const PREFIX_MUSIC = './assets/music/'
 
 const GAME_NAME = "Project Persona"
 const GAME_DEV = "mochipie95"
@@ -114,6 +115,7 @@ export default {
         textbox: ''
       },
       images: {},
+      osts: {},
 
       // default new bookmark
       bookmark: {},
@@ -199,18 +201,22 @@ export default {
     }
 
     // load moosic
-    var titleMusic = require('./assets/music/title.mp3')
-    this.moosic = new Howl({
-        autoplay: true,
-        src: [titleMusic],
-        loop: true,
-        volume: 0.5
-      })
-    // play moosic
-    this.moosic.play()
+    this.osts.title = require(PREFIX_MUSIC + 'title.mp3')
+    // var titleMusic = require('./assets/music/title.mp3')
+    // play title music
+    this.playMusic('title')
 
   },
   methods: {
+    playMusic(musicStr) {
+      if (this.moosic) this.moosic.fade(0.5, 0)
+      switch (musicStr) {
+        case 'title':
+          this.moosic = getPlayMusic(this.osts.title)
+          break;
+      }
+      this.moosic.play();
+    },
     getPlayerNameObject() {
       return {
         name: getPlayerName(this.sections),
