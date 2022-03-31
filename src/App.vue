@@ -116,6 +116,7 @@ export default {
       },
       images: {},
       osts: {},
+      currentlyPlaying: '',
 
       // default new bookmark
       bookmark: {},
@@ -222,11 +223,13 @@ export default {
   },
   methods: {
     playMusic(musicStr) {
+      if (musicStr == this.currentlyPlaying) return;
       if (this.moosic) this.moosic.fade(0.5, 0, 1)
       this.moosic = null
       for (const [key, value] of Object.entries(this.osts)) {
         if (key == musicStr) { 
           this.moosic = getPlayMusic(value)
+          this.currentlyPlaying = musicStr
           break;
         }
       }
