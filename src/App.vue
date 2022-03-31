@@ -453,9 +453,13 @@ export default {
       }
       this.dialogue.sceneName = firstSceneName
       // enact scene flags
-      this.setFlags(getResultFlagsFromScene(getCurrentScene(this.script, this.dialogue.sceneName)))
+      var scene = getCurrentScene(this.script, this.dialogue.sceneName)
+      this.setFlags(getResultFlagsFromScene(scene))
       // first line
-      this.dialogue.lineName = getStartLineName(getCurrentScene(this.script, this.dialogue.sceneName))
+      this.dialogue.lineName = getStartLineName(scene)
+      // load music
+      console.log(scene.ost)
+      this.playMusic(scene.ost)
 
       // set progress
       this.onEmitProgress({
