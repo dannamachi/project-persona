@@ -62,6 +62,7 @@
 import { reactive, computed } from 'vue'
 import SHA256 from 'sha256-es';
 import clone from 'just-clone'
+import { Howl } from 'howler';
 import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneEligible } from './utils/flags'
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker } from './utils/script'
@@ -106,6 +107,9 @@ export default {
       nameChangeSuccess: false,
       nameChangeError: false,
 
+      // music
+      moosic: null,
+
       ui: {
         textbox: ''
       },
@@ -145,7 +149,8 @@ export default {
       bookmarks: computed(() => this.bookmarks),
       dialogue: computed(() => this.dialogue),
       speaker: computed(() => this.speaker),
-      script: computed(() => this.script)
+      script: computed(() => this.script),
+      moosic: computed(() => this.moosic)
     }
   },
   setup() {
@@ -192,6 +197,17 @@ export default {
       }
 
     }
+
+    // load moosic
+    var titleMusic = require('./assets/music/title.mp3')
+    this.moosic = new Howl({
+        autoplay: true,
+        src: [titleMusic],
+        loop: true,
+        volume: 0.5
+      })
+    // play moosic
+    this.moosic.play()
 
   },
   methods: {
