@@ -1,6 +1,7 @@
 <template>
   <div>
     <!-- main frame -->
+    <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
@@ -67,6 +68,7 @@ import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneElig
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker } from './utils/script'
 
+import StartFrame from './frames/StartFrame.vue'
 import ProfileFrame from './frames/ProfileFrame.vue'
 import DialogueFrame from './frames/DialogueFrame.vue'
 import TitleFrame from './frames/TitleFrame.vue'
@@ -86,12 +88,14 @@ const FRAME_TITLE = 'TITLE FRAME'
 const FRAME_DIALOGUE = "DIALOGUE FRAME"
 // const FRAME_FLOWCHART = "FLOWCHART FRAME"
 const FRAME_PROFILE = "PROFILE FRAME"
+const FRAME_START = "START FRAME"
 
 // const KEY_NICK_MC = 'morelle'
 
 export default {
   name: 'App',
   components: {
+    StartFrame,
     ProfileFrame,
     DialogueFrame,
     TitleFrame,
@@ -100,7 +104,7 @@ export default {
   },
   data() {
     return {
-      frame: FRAME_TITLE,
+      frame: FRAME_START,
       toggleDialogue: false,
       toggleSideMenu: false,
       loadModalSuccess: false,
@@ -217,8 +221,6 @@ export default {
     // load title moosic
     this.osts.title = require(PREFIX_MUSIC + 'title.mp3')
     // var titleMusic = require('./assets/music/title.mp3')
-    // play title music
-    this.playMusic('title')
 
   },
   methods: {
@@ -312,6 +314,7 @@ export default {
       if (frameStr == "dialogue") return this.getCurrentFrame() == FRAME_DIALOGUE
       else if (frameStr == "title") return this.getCurrentFrame() == FRAME_TITLE
       else if (frameStr == "profile") return this.getCurrentFrame() == FRAME_PROFILE
+      else if (frameStr == 'start') return this.getCurrentFrame() == FRAME_START
       return false
     },
     switchFrame(frameStr) {
