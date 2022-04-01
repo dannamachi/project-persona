@@ -41,6 +41,9 @@
         <div>
           <button type='button' class='btn btn-link' data-bs-dismiss="offcanvas" @click='switchFrame("profile")'>Profile</button>
         </div>
+        <div>
+          <button type='button' class='btn btn-link' @click='toggleMusic()'>Music on/off</button>
+        </div>
         <!-- <div class="dropdown mt-3">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
             Dropdown button
@@ -114,13 +117,14 @@ export default {
 
       // music
       moosic: null,
+      currentlyPlaying: '',
+      isPlay: true,
 
       ui: {
         textbox: ''
       },
       images: {},
       osts: {},
-      currentlyPlaying: '',
 
       // default new bookmark
       bookmark: {},
@@ -224,6 +228,14 @@ export default {
 
   },
   methods: {
+    toggleMusic() {
+      this.isPlay = !this.isPlay
+      if (this.isPlay) {
+        if (this.moosic) this.moosic.play()
+      } else {
+        this.moosic.stop()
+      }
+    },
     playMusic(musicStr) {
       if (musicStr == this.currentlyPlaying) return;
       if (this.moosic) this.moosic.fade(0.5, 0, 1)
@@ -235,7 +247,7 @@ export default {
           break;
         }
       }
-      if (this.moosic) this.moosic.play();
+      if (this.moosic && this.isPlay) this.moosic.play();
     },
     getPlayerNameObject() {
       return {
