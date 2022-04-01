@@ -34,23 +34,28 @@
         </div>
 
         <!-- textbox -->
-        <div class='container-fluid textBox float-end' @click='advanceText()' :style="{
-            backgroundImage: 'url(\'' + ui.textbox + '\')'
+        <div class='container-fluid textBox' @click='advanceText()'>
+            <div class='mcPart float-start' :style="{
+              backgroundImage: 'url(\'' + sprite.player + '\')'
             }">
-            <!-- fix textbox shift when empty speaker -->
-            <p class='text-center speakerBox'>{{ isLoaded() ? m__getSpeakerName() : 'no one' }}</p>
-            <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
-              {{ isLoaded() ? m__getCurrentText() : 'nothing at all' }}
-            </p>
-            <p v-else class='text-start text-wrap text-break textingBox'>
-              {{ m__getChoicePrompt() }}
-            </p>
+            </div>
+            <div class='textPart' :style="{
+              backgroundImage: 'url(\'' + ui.textbox + '\')'
+            }">
+              <p class='text-center speakerBox'>{{ isLoaded() ? m__getSpeakerName() : 'no one' }}</p>
+              <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
+                {{ isLoaded() ? m__getCurrentText() : 'nothing at all' }}
+              </p>
+              <p v-else class='text-start text-wrap text-break textingBox'>
+                {{ m__getChoicePrompt() }}
+              </p>
+            </div>
         </div>
 <!-- backgroundImage: 'url(\'' + sprite.player + '\')' -->
         <!-- mc box -->
-        <div class='position-absolute bottom-0 start-0'>
+        <!-- <div class='position-absolute bottom-0 start-0'>
           <img v-if='sprite.player != ""' :src='sprite.player' width='200' height='250'/>
-        </div>
+        </div> -->
 
         </div>
   </div>
@@ -214,16 +219,41 @@ export default {
   background-repeat: no-repeat,no-repeat,no-repeat;
   background-position: 5% 100%,center,95% 100%;
 }
-.textBox {
-  width: 80%;
-  height: 30%;
+
+.mcPart {
+  display: inline-block;
+  width: 20%;
+  height: 100%;
   border-style: solid;
-  border-color: greenyellow;
-  /* background-image: url('assets/textbox.jpeg'); */
+  border-color: rebeccapurple;
+  background-position: left;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.textPart {
+  display: inline-block;
+  width: 80%;
+  height: 100%;
+  border-style: solid;
+  border-color: royalblue;
   background-position: left;
   background-size: 100% 100%;
   background-repeat: no-repeat;
   padding-top: 3.5vmin;
+}
+
+.textBox {
+  width: 100%;
+  height: 30%;
+  border-style: solid;
+  border-color: greenyellow;
+  /* background-image: url('assets/textbox.jpeg'); */
+  /* background-position: left; */
+  padding-right: 0;
+  padding-left: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 .speakerBox {
