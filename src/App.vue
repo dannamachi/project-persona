@@ -10,7 +10,7 @@
     <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
-    <DialogueFrame v-bind:display='display' v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
+    <DialogueFrame v-bind:sprite='sprite' v-bind:background='background' v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleDialogue'
     @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'
     @to-next-section-with-anima='runNextSectionWithAnimation' @to-next-scene-with-anima='runNextSceneWithAnimation'/>
@@ -148,14 +148,12 @@ export default {
       game_hash: '',
 
       // dialogue
-      display: {
-        background: '',
-        sprite: {
-          left: '',
-          right: '',
-          center: '',
-          player: ''
-        }
+      background: '',
+      sprite: {
+        left: '',
+        right: '',
+        center: '',
+        player: ''
       },
       dialogue: {
         sceneName: null,
@@ -474,10 +472,10 @@ export default {
         var scene = getCurrentScene(this.script, this.dialogue.sceneName)
         this.setFlags(getResultFlagsFromScene(scene))
         // load scene display
-        this.display.background = this.images['bg_' + scene.background]
-        for (const [key1, value1] of Object.entries(this.display.sprite)) {
+        this.background = this.images['bg_' + scene.background]
+        for (const [key1, value1] of Object.entries(this.sprite)) {
           value1
-          this.display.sprite[key1] = ''
+          this.sprite[key1] = ''
         }
         // load first line
         this.dialogue.lineName = getStartLineName(scene)
@@ -486,7 +484,7 @@ export default {
         for (const [key, value] of Object.entries(line)) {
           if (key.startsWith('sprite__')) {
             // assume _ in between and png
-            this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+            this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
           }
         }
         // load music
@@ -507,7 +505,7 @@ export default {
       for (const [key, value] of Object.entries(line)) {
         if (key.startsWith('sprite__')) {
           // assume _ in between and png
-          this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+          this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
         }
       }
     },
@@ -612,10 +610,10 @@ export default {
       var scene = getCurrentScene(this.script, this.dialogue.sceneName)
       this.setFlags(getResultFlagsFromScene(scene))
       // load scene display
-      this.display.background = this.images['bg_' + scene.background]
-      for (const [key1, value1] of Object.entries(this.display.sprite)) {
+      this.background = this.images['bg_' + scene.background]
+      for (const [key1, value1] of Object.entries(this.sprite)) {
         value1
-        this.display.sprite[key1] = ''
+        this.sprite[key1] = ''
       }
       // first line
       this.dialogue.lineName = getStartLineName(scene)
@@ -624,7 +622,7 @@ export default {
       for (const [key, value] of Object.entries(line)) {
         if (key.startsWith('sprite__')) {
           // assume _ in between and png
-          this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+          this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
         }
       }
       // load music

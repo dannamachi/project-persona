@@ -6,12 +6,12 @@
         showRight: showing == "right",
         showCenter: showing == "center"
         }' :style="{ 
-            backgroundImage: display ? 'url(\'' + display.background + '\')' : 'url(\'../assets/interfaces/start_screen.png\')'
+            backgroundImage: background ? 'url(\'' + background + '\')' : ''
         }">
 
         <!-- sprite display -->
         <div v-if='notChoice' class='container-fluid aboveText' :style="{ 
-            backgroundImage: display ? 'url(\'' + display.sprite.left + '\'), url(\'' + display.sprite.center + '\'), url(\'' + display.sprite.right + '\')' : ''
+            backgroundImage: sprite ? 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.right + '\')' : ''
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
@@ -36,7 +36,7 @@
         <!-- textbox -->
         <div class='container-fluid textBox' @click='advanceText()'>
             <div class='mcPart float-start' :style="{
-              backgroundImage: display ? 'url(\'' + display.sprite.player + '\')' : ''
+              backgroundImage: sprite ? 'url(\'' + sprite.player + '\')' : ''
             }">
             </div>
             <div class='textPart' :style="{
@@ -69,7 +69,7 @@ export default {
   name: 'DialogueFrame',
   props: [
         'ui', 'images',
-        'sections', 'display'
+        'sections', 'background', 'sprite'
   ],
   inject: ['bookmark', 'dialogue', 'script', 'speaker', 'display'],
   data() {
