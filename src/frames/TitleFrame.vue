@@ -10,19 +10,19 @@
             <!-- title screen quick link -->
             <div class='container-fluid aboveText pt-5'>
 
-                <div class='my-5 row justify-content-end'>
-                    <div class='col'>
-                        <p class='fs-3 btn-link text-end' @click='quickLinkTo("start")'>
+                <div class='my-5 row justify-content-end px-2'>
+                    <div class='col-2 float-end bg-black'>
+                        <div class='fs-3 text-white text-center' @click='quickLinkTo("start")'>
                             Start
-                        </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class='my-5 row justify-content-end'>
-                    <div class='col'>
-                        <p class='fs-3 btn-link text-end' data-bs-toggle="modal" data-bs-target="#loadModal" @click='quickLinkTo("load")'>
+                <div class='my-5 row justify-content-end px-2'>
+                    <div class='col-2 float-end bg-black'>
+                        <div class='fs-3 text-white text-center' data-bs-toggle="modal" data-bs-target="#loadModal" @click='quickLinkTo("load")'>
                             Load
-                        </p>
+                        </div>
                     </div>
                 </div>
     

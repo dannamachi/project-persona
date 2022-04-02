@@ -24,24 +24,24 @@
         <div v-else class='container-fluid aboveText pt-3'>
             
           <div v-for='(option, index) in m__getEligibleOptions()' :key='index' class='optionSpacing row justify-content-end'>
-            <div class='col'>
-            <p class='bg-black btn-link text-end optionBox' @click='selectOption(option)'>
-              {{ option.name }}
-            </p>
+            <div class='col-6'>
+              <div class='bg-black text-white text-end optionBox' @click='selectOption(option)'>
+                {{ option.name }}
+              </div>
             </div>
           </div>
   
         </div>
 
         <!-- textbox -->
-        <div class='container-fluid textBox' @click='advanceText()'>
+        <div class='container-fluid textBox' @click='advanceText()' :style="{
+              backgroundImage: ui ? 'url(\'' + ui.textbox + '\')' : ''
+            }">
             <div class='mcPart float-start' :style="{
               backgroundImage: sprite ? 'url(\'' + sprite.player + '\')' : ''
             }">
             </div>
-            <div class='textPart' :style="{
-              backgroundImage: ui ? 'url(\'' + ui.textbox + '\')' : ''
-            }">
+            <div class='textPart'>
               <p class='text-center speakerBox'>{{ isLoaded() ? m__getSpeakerName() : 'no one' }}</p>
               <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
                 {{ isLoaded() ? m__getCurrentText() : 'nothing at all' }}

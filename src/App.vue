@@ -16,8 +16,8 @@
     @to-next-section-with-anima='runNextSectionWithAnimation' @to-next-scene-with-anima='runNextSceneWithAnimation'/>
 
     <!-- button to side menu-->
-    <div v-if='!isOfFrame("start") && !isOfFrame("credit")' class='position-absolute top-50 start-0'>
-      <img class='mx-3  ' src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
+    <div v-if='!isOfFrame("start") && !isOfFrame("credit")' class='position-absolute top-50 start-0 bg-white'>
+      <img src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
       <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
         Button with data-bs-target
       </button> -->
