@@ -6,12 +6,12 @@
         showRight: showing == "right",
         showCenter: showing == "center"
         }' :style="{ 
-            backgroundImage: 'url(\'' + background + '\')'
+            backgroundImage: 'url(\'' + display.background + '\')'
         }">
 
         <!-- sprite display -->
         <div v-if='notChoice' class='container-fluid aboveText' :style="{ 
-            backgroundImage: 'url(\'' + sprite.left + '\'), url(\'' + sprite.center + '\'), url(\'' + sprite.right + '\')'
+            backgroundImage: 'url(\'' + display.sprite.left + '\'), url(\'' + display.sprite.center + '\'), url(\'' + display.sprite.right + '\')'
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
@@ -36,7 +36,7 @@
         <!-- textbox -->
         <div class='container-fluid textBox' @click='advanceText()'>
             <div class='mcPart float-start' :style="{
-              backgroundImage: 'url(\'' + sprite.player + '\')'
+              backgroundImage: 'url(\'' + display.sprite.player + '\')'
             }">
             </div>
             <div class='textPart' :style="{
@@ -69,17 +69,11 @@ export default {
   name: 'DialogueFrame',
   props: [
         'ui', 'images',
-        'sections'
+        'sections', 'display'
   ],
-  inject: ['bookmark', 'dialogue', 'script', 'speaker'],
+  inject: ['bookmark', 'dialogue', 'script', 'speaker', 'display'],
   data() {
     return {
-        sprite: {
-            left: '',
-            right: '',
-            center: '',
-            player: ''
-        },
         showing: "left",
         showingText: "Jfdjnsfjsn is simply dummy text of the printing and typesetting industry. ejcnjsdn has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
         // speaker: 'hello',
@@ -88,14 +82,13 @@ export default {
         //     lineName: null
         // },
         canAdvance: true,
-        background: '',
         //script: {},
         notChoice: true
     }
   },
   created() {
     // load the scene
-    this.loadScene()
+    // this.loadScene()
     this.canAdvance = true
   },
   methods: {
@@ -136,7 +129,6 @@ export default {
       this.notChoice = true
       this.canAdvance = true
       this.$emit("toNextSection")
-      this.loadScene()
     },
 
     advanceText() {
@@ -154,18 +146,15 @@ export default {
               this.canAdvance = false
             } else {
               // next section
-              this.$emit("toNextSection")
-              this.loadScene()
+              this.$emit("toNextSectionWithAnima")
             }
           } else {
             // next scene
-            this.$emit("toNextScene")
-            this.loadScene()
+            this.$emit("toNextSceneWithAnima")
           }
         } else {
           // next line
           this.$emit("toNextLine")
-          this.loadSprite()
         }
       }
     },
@@ -181,29 +170,31 @@ export default {
       })
     },
 
-    loadScene() {
-      var scene = this.m__getCurrentScene()
-      this.background = this.images['bg_' + scene.background]
-      // load first line
-      this.loadSprite()
-    },
-    loadSprite() {
-      // clear display
-      for (const [key1, value1] of Object.entries(this.sprite)) {
-        value1
-        this.sprite[key1] = ''
-      }
-      // load display
-      var line = this.m__getCurrentLine()
-      for (const [key, value] of Object.entries(line)) {
-        if (key.startsWith('sprite__')) {
-          // assume _ in between and png
-          this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
-        }
-      }
-      // emit progress
-      this.emitProgress()
-    },
+    // loadScene() {
+    //   // clear scene
+    //   this.background = ''
+    //   var scene = this.m__getCurrentScene()
+    //   this.background = this.images['bg_' + scene.background]
+    //   // load first line
+    //   this.loadSprite()
+    // },
+    // loadSprite() {
+    //   // clear display
+    //   for (const [key1, value1] of Object.entries(this.sprite)) {
+    //     value1
+    //     this.sprite[key1] = ''
+    //   }
+    //   // load display
+    //   var line = this.m__getCurrentLine()
+    //   for (const [key, value] of Object.entries(line)) {
+    //     if (key.startsWith('sprite__')) {
+    //       // assume _ in between and png
+    //       this.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+    //     }
+    //   }
+    //   // emit progress
+    //   this.emitProgress()
+    // },
     
   }
 }

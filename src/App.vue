@@ -10,9 +10,10 @@
     <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
-    <DialogueFrame v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
+    <DialogueFrame v-bind:display='display' v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
     v-bind:sections='sections' @select-option='onSelectOption' @pass-progress='onEmitProgress' :key='toggleDialogue'
-    @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'/>
+    @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'
+    @to-next-section-with-anima='runNextSectionWithAnimation' @to-next-scene-with-anima='runNextSceneWithAnimation'/>
 
     <!-- button to side menu-->
     <div v-if='!isOfFrame("start") && !isOfFrame("credit")' class='position-absolute top-50 start-0'>
@@ -134,7 +135,7 @@ export default {
       // music
       moosic: null,
       currentlyPlaying: '',
-      isPlay: true,
+      isPlay: false,
 
       ui: {
         textbox: ''
@@ -147,6 +148,15 @@ export default {
       game_hash: '',
 
       // dialogue
+      display: {
+        background: '',
+        sprite: {
+          left: '',
+          right: '',
+          center: '',
+          player: ''
+        }
+      },
       dialogue: {
         sceneName: null,
         lineName: null
@@ -228,10 +238,6 @@ export default {
 
     // create unique game hash
     this.getGameHash()
-    // restart game
-    this.restartBookmark()
-    this.setDialogue(getFirstSection(this.sections, this.bookmark.flags))
-    this.reloadDialogue()
 
     // load interfaces
     this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
@@ -277,6 +283,11 @@ export default {
     this.osts.title = require(PREFIX_MUSIC + 'title.mp3')
     // var titleMusic = require('./assets/music/title.mp3')
 
+    // restart game
+    this.restartBookmark()
+    this.setDialogue(getFirstSection(this.sections, this.bookmark.flags))
+    this.reloadDialogue()
+
   },
   watch: {
     isFadeRunning: function(currentValue, oldValue) {
@@ -290,6 +301,9 @@ export default {
             break;
           case 'nextSection':
             this.onNextSection()
+            break;
+          case 'nextScene':
+            this.onNextScene()
             break;
         }
         this.transitionMethod = null
@@ -395,6 +409,12 @@ export default {
       }
       this.startFadingToBlack()
     },
+    runNextSceneWithAnimation() {
+      this.transitionMethod = {
+        name: 'nextScene'
+      }
+      this.startFadingToBlack()
+    },
 
     validateGameHash(gamedt) {
       if (gamedt.game_hash) {
@@ -453,15 +473,43 @@ export default {
         this.dialogue.sceneName = nextScene
         var scene = getCurrentScene(this.script, this.dialogue.sceneName)
         this.setFlags(getResultFlagsFromScene(scene))
+        // load scene display
+        this.display.background = this.images['bg_' + scene.background]
+        for (const [key1, value1] of Object.entries(this.display.sprite)) {
+          value1
+          this.display.sprite[key1] = ''
+        }
         // load first line
         this.dialogue.lineName = getStartLineName(scene)
+        // load line display
+        var line = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName)
+        for (const [key, value] of Object.entries(line)) {
+          if (key.startsWith('sprite__')) {
+            // assume _ in between and png
+            this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+          }
+        }
         // load music
-        console.log(scene.ost)
+        // console.log(scene.ost)
         this.playMusic(scene.ost)
+        // save progress
+        this.onEmitProgress({
+          section: this.script.meta__id,
+          scene: this.dialogue.sceneName,
+          line: this.dialogue.lineName
+        })
       }
     },
     onNextLine() {
       this.dialogue.lineName = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName).next
+      // load line display
+      var line = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName)
+      for (const [key, value] of Object.entries(line)) {
+        if (key.startsWith('sprite__')) {
+          // assume _ in between and png
+          this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+        }
+      }
     },
     onNextSection() {
       var nextScript = getNextSection(this.script, this.sections, this.bookmark.flags)
@@ -563,10 +611,24 @@ export default {
       // enact scene flags
       var scene = getCurrentScene(this.script, this.dialogue.sceneName)
       this.setFlags(getResultFlagsFromScene(scene))
+      // load scene display
+      this.display.background = this.images['bg_' + scene.background]
+      for (const [key1, value1] of Object.entries(this.display.sprite)) {
+        value1
+        this.display.sprite[key1] = ''
+      }
       // first line
       this.dialogue.lineName = getStartLineName(scene)
+      // load line display
+      var line = getCurrentLine(this.script, this.dialogue.sceneName, this.dialogue.lineName)
+      for (const [key, value] of Object.entries(line)) {
+        if (key.startsWith('sprite__')) {
+          // assume _ in between and png
+          this.display.sprite[value.pos] = this.images[value.keyName + "_" + value.exp]
+        }
+      }
       // load music
-      console.log(scene.ost)
+      // console.log(scene.ost)
       this.playMusic(scene.ost)
 
       // set progress
