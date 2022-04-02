@@ -21,11 +21,11 @@
         </div>
         <!-- if choice -->
         <!-- choice in column -->
-        <div v-else class='container-fluid aboveText pt-5'>
+        <div v-else class='container-fluid aboveText pt-3'>
             
-          <div v-for='(option, index) in m__getEligibleOptions()' :key='index' class='my-5 row justify-content-end'>
+          <div v-for='(option, index) in m__getEligibleOptions()' :key='index' class='optionSpacing row justify-content-end'>
             <div class='col'>
-            <p class='fs-3 bg-black btn-link text-end' @click='selectOption(option)'>
+            <p class='bg-black btn-link text-end optionBox' @click='selectOption(option)'>
               {{ option.name }}
             </p>
             </div>
@@ -266,6 +266,24 @@ export default {
   font-size: 3vmin;
   margin-left: 4vmin;
   padding-right: 5vmin;
+}
+
+@media (max-width: 720px) {
+  .optionBox {
+    font-size: 20px;
+  }
+  .optionSpacing {
+    margin-top: 30px;
+  }
+}
+
+@media (min-width: 720px) {
+  .optionBox {
+    font-size: 30px;
+  }
+    .optionSpacing {
+    margin-top: 35px;
+  }
 }
 
 </style>
