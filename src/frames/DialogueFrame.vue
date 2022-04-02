@@ -222,7 +222,7 @@ export default {
 
 .mcPart {
   display: inline-block;
-  width: 20%;
+  width: 30vh;
   height: 100%;
   border-style: solid;
   border-color: rebeccapurple;
@@ -233,7 +233,7 @@ export default {
 
 .textPart {
   display: inline-block;
-  width: 80%;
+  width: calc(100% - 30vh);
   height: 100%;
   border-style: solid;
   border-color: royalblue;
