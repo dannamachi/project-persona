@@ -1,6 +1,7 @@
 <template>
   <div>
     <!-- main frame -->
+    <CreditFrame v-if='isOfFrame("credit")' @return-title='switchFrame("title")'/>
     <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
@@ -9,7 +10,7 @@
     @to-next-scene='onNextScene' @to-next-line='onNextLine' @to-next-section='onNextSection'/>
 
     <!-- button to side menu-->
-    <div class='position-absolute top-50 start-0'>
+    <div v-if='!isOfFrame("start") && !isOfFrame("credit")' class='position-absolute top-50 start-0'>
       <img class='mx-3  ' src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
       <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
         Button with data-bs-target
@@ -71,6 +72,7 @@ import { setFlag, getResultFlagsFromScript, getResultFlagsFromScene, isSceneElig
 import { getFirstSection, getNextScene, getCurrentScene, getCurrentLine, getNextSection, getSectionByName, getSceneByName } from './utils/dialogue'
 import { getStartSceneName, getStartLineName, getPlayerName, getPlayerPronoun, getPlayerPossessive, getPlayerTitle, setPlayerName, setPlayerPossessive, setPlayerPronoun, setPlayerTitle, setNickableSpeaker } from './utils/script'
 
+import CreditFrame from './frames/CreditFrame.vue'
 import StartFrame from './frames/StartFrame.vue'
 import ProfileFrame from './frames/ProfileFrame.vue'
 import DialogueFrame from './frames/DialogueFrame.vue'
@@ -92,12 +94,14 @@ const FRAME_DIALOGUE = "DIALOGUE FRAME"
 // const FRAME_FLOWCHART = "FLOWCHART FRAME"
 const FRAME_PROFILE = "PROFILE FRAME"
 const FRAME_START = "START FRAME"
+const FRAME_CREDIT = "CREDIT FRAME"
 
 // const KEY_NICK_MC = 'morelle'
 
 export default {
   name: 'App',
   components: {
+    CreditFrame,
     StartFrame,
     ProfileFrame,
     DialogueFrame,
@@ -327,6 +331,7 @@ export default {
       else if (frameStr == "title") return this.getCurrentFrame() == FRAME_TITLE
       else if (frameStr == "profile") return this.getCurrentFrame() == FRAME_PROFILE
       else if (frameStr == 'start') return this.getCurrentFrame() == FRAME_START
+      else if (frameStr == 'credit') return this.getCurrentFrame() == FRAME_CREDIT
       return false
     },
     switchFrame(frameStr) {
@@ -342,6 +347,8 @@ export default {
         this.nameChangeSuccess = false;
         this.nameChangeError = false;
         this.frame = FRAME_PROFILE
+      } else if (frameStr == 'credit') {
+        this.frame = FRAME_CREDIT
       }
       this.reloadSidemenu()
     },
@@ -378,7 +385,7 @@ export default {
       var nextScript = getNextSection(this.script, this.sections, this.bookmark.flags)
       if (nextScript == null) {
         // end game
-        this.switchFrame("title")
+        this.switchFrame("credit")
       } else {
         this.setDialogue(getNextSection(this.script, this.sections, this.bookmark.flags))
         this.reloadDialogue()
