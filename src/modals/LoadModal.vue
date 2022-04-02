@@ -9,6 +9,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <p>Paste content of save file here ^^</p>
                     <input name="text" placeholder="paste save file content here..." v-model='inputJSON' />
                     <button class='mx-2 btn btn-dark' type='button' @click='loadGame()'>Load</button>
                     <div v-if='toggleError' class="alert alert-danger" role="alert">

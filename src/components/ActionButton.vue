@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button v-if='showingButton' type='button' class='btn btn-info' @click='actionClick()'> {{ getButtonText() }}</button>
+        <button v-if='showingButton' data-bs-toggle="modal" data-bs-target="#alertModal" type='button' class='btn btn-info' @click='actionClick()'> {{ getButtonText() }}</button>
     </div>
 </template>
 

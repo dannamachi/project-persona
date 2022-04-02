@@ -60,6 +60,7 @@
 
     <!-- modals -->
     <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess' v-bind:toggleError='loadModalError' />
+    <AlertModal />
   </div>
 </template>
 
@@ -79,6 +80,7 @@ import DialogueFrame from './frames/DialogueFrame.vue'
 import TitleFrame from './frames/TitleFrame.vue'
 import ActionButton from './components/ActionButton.vue'
 import LoadModal from './modals/LoadModal.vue'
+import AlertModal from './modals/AlertModal.vue'
 
 const PREFIX_SPRITE = './assets/sprites/'
 const PREFIX_BG = './assets/backgrounds/'
@@ -107,7 +109,8 @@ export default {
     DialogueFrame,
     TitleFrame,
     ActionButton,
-    LoadModal
+    LoadModal,
+    AlertModal
   },
   data() {
     return {
