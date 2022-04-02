@@ -7,7 +7,7 @@
     }">
     <!-- main frame -->
     <CreditFrame v-if='isOfFrame("credit")' @return-title='switchFrame("title")'/>
-    <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
+    <StartFrame v-if='isOfFrame("start")' @start-game='runSwitchFrameWithAnimation("dialogue")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
     <DialogueFrame v-bind:sprite='sprite' v-bind:background='background' v-show='isOfFrame("dialogue")' v-bind:ui='ui' v-bind:images='images'
