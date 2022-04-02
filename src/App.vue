@@ -1,5 +1,10 @@
 <template>
-  <div>
+  <div class='mainBox' :style="{
+    'pointer-events': isFadeRunning ? 'none' : 'auto'
+  }">
+    <div :style="{
+      opacity: opacityValue
+    }">
     <!-- main frame -->
     <CreditFrame v-if='isOfFrame("credit")' @return-title='switchFrame("title")'/>
     <StartFrame v-if='isOfFrame("start")' @start-game='switchFrame("title")'/>
@@ -61,11 +66,12 @@
     <!-- modals -->
     <LoadModal @load-game='onLoadGame' v-bind:toggleSuccess='loadModalSuccess' v-bind:toggleError='loadModalError' />
     <AlertModal />
+    </div>
   </div>
 </template>
 
 <script>
-import { reactive, computed } from 'vue'
+import { reactive, computed, ref } from 'vue'
 import SHA256 from 'sha256-es';
 import clone from 'just-clone'
 import { getPlayMusic } from './utils/music'
@@ -122,6 +128,9 @@ export default {
       nameChangeSuccess: false,
       nameChangeError: false,
 
+      // transition
+      transitionMethod: null,
+
       // music
       moosic: null,
       currentlyPlaying: '',
@@ -172,8 +181,43 @@ export default {
     }
   },
   setup() {
+    var opacityValue = ref(1.0)
+    var isFadeRunning = ref(false)
+
+    const fadeToBlack = () => {
+      if (isFadeRunning.value) {
+        opacityValue.value -= 0.01;
+      }
+      if (opacityValue.value <= 0 && isFadeRunning.value) {
+        isFadeRunning.value = false;
+      }
+    }
+
+    const fadeToWhite = () => {
+      if (isFadeRunning.value) {
+          opacityValue.value += 0.01;
+      }
+      if (opacityValue.value >= 1.0 && isFadeRunning.value) {
+        isFadeRunning.value = false;
+      }
+    }
+
+    const fadeInterval = ref(null)
+
+    const startFadingToBlack = () => {
+      if (fadeInterval.value) clearInterval(fadeInterval.value)
+      fadeInterval.value = setInterval(fadeToBlack, 20)
+      isFadeRunning.value = true
+    }
+
+    const startFadingToWhite = () => {
+      if (fadeInterval.value) clearInterval(fadeInterval.value)
+      fadeInterval.value = setInterval(fadeToWhite, 20)
+      isFadeRunning.value = true
+    }
+
     var sections = reactive([])
-    return { sections }
+    return { sections, startFadingToBlack, startFadingToWhite, fadeInterval, isFadeRunning, opacityValue }
   },
   created() {
     this.loadScripts()
@@ -233,6 +277,27 @@ export default {
     this.osts.title = require(PREFIX_MUSIC + 'title.mp3')
     // var titleMusic = require('./assets/music/title.mp3')
 
+  },
+  watch: {
+    isFadeRunning: function(currentValue, oldValue) {
+      oldValue
+      if (!currentValue && this.transitionMethod) {
+        clearInterval(this.fadeInterval)
+        // run method
+        switch (this.transitionMethod.name) {
+          case 'switchFrame':
+            this.switchFrame(this.transitionMethod.arg)
+            break;
+          case 'nextSection':
+            this.onNextSection()
+            break;
+        }
+        this.transitionMethod = null
+        this.startFadingToWhite()
+      } else if (!currentValue) {
+        clearInterval(this.fadeInterval)
+      }
+    }
   },
   methods: {
     toggleMusic() {
@@ -315,6 +380,20 @@ export default {
         // console.log(err)
         this.loadModalError = true
       }
+    },
+
+    runSwitchFrameWithAnimation(frameStr) {
+      this.transitionMethod = {
+        name: 'switchFrame',
+        arg: frameStr
+      }
+      this.startFadingToBlack()
+    },
+    runNextSectionWithAnimation() {
+      this.transitionMethod = {
+        name: 'nextSection'
+      }
+      this.startFadingToBlack()
     },
 
     validateGameHash(gamedt) {
@@ -417,7 +496,8 @@ export default {
     },
     onQuickLink(linkStr) {
       if (linkStr == "start") {
-        this.switchFrame("dialogue")
+        // this.switchFrame("dialogue")
+        this.runSwitchFrameWithAnimation('dialogue')
       } else if (linkStr == "load") {
         // to load modal
         this.loadModalSuccess = false
@@ -543,6 +623,10 @@ export default {
   text-align: center;
   color: #ffffff;
   /* margin-top: 60px; */
+}
+
+.mainBox {
+  background-color: black;
 }
 
 @media (min-width: 1280px) {
