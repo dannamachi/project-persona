@@ -366,7 +366,7 @@ export default {
       // if no next eligible scene
       if (!nextScene) {
         // to end
-        this.switchFrame("title")
+        this.switchFrame("credit")
       } else {
         this.dialogue.sceneName = nextScene
         var scene = getCurrentScene(this.script, this.dialogue.sceneName)
