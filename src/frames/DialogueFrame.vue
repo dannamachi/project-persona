@@ -6,12 +6,12 @@
         showRight: showing == "right",
         showCenter: showing == "center"
         }' :style="{ 
-            backgroundImage: 'url(\'' + display.background + '\')'
+            backgroundImage: display ? 'url(\'' + display.background + '\')' : 'url(\'../assets/interfaces/start_screen.png\')'
         }">
 
         <!-- sprite display -->
         <div v-if='notChoice' class='container-fluid aboveText' :style="{ 
-            backgroundImage: 'url(\'' + display.sprite.left + '\'), url(\'' + display.sprite.center + '\'), url(\'' + display.sprite.right + '\')'
+            backgroundImage: display ? 'url(\'' + display.sprite.left + '\'), url(\'' + display.sprite.center + '\'), url(\'' + display.sprite.right + '\')' : ''
         }">
             <!-- <button @click='toggleShowing("left")'>left</button>
             <button @click='toggleShowing("center")'>center</button>
@@ -36,11 +36,11 @@
         <!-- textbox -->
         <div class='container-fluid textBox' @click='advanceText()'>
             <div class='mcPart float-start' :style="{
-              backgroundImage: 'url(\'' + display.sprite.player + '\')'
+              backgroundImage: display ? 'url(\'' + display.sprite.player + '\')' : ''
             }">
             </div>
             <div class='textPart' :style="{
-              backgroundImage: 'url(\'' + ui.textbox + '\')'
+              backgroundImage: ui ? 'url(\'' + ui.textbox + '\')' : ''
             }">
               <p class='text-center speakerBox'>{{ isLoaded() ? m__getSpeakerName() : 'no one' }}</p>
               <p v-if='notChoice' class='text-start text-wrap text-break textingBox'>
