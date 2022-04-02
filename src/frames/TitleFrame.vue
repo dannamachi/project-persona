@@ -2,7 +2,7 @@
     <div class='wrapper'>
         <div :class='{
         gameBox: true,
-        showLeft: showing == "left",
+        showLeft: true,
         showRight: showing == "right",
         showCenter: showing == "center",
         titleBackground: true
@@ -11,7 +11,7 @@
             <div class='container-fluid aboveText pt-5'>
 
                 <div class='my-5 row justify-content-end px-2'>
-                    <div class='col-2 float-end bg-black'>
+                    <div class='titleButton float-end bg-black'>
                         <div class='fs-3 text-white text-center' @click='quickLinkTo("start")'>
                             Start
                         </div>
@@ -19,7 +19,7 @@
                 </div>
 
                 <div class='my-5 row justify-content-end px-2'>
-                    <div class='col-2 float-end bg-black'>
+                    <div class='titleButton float-end bg-black'>
                         <div class='fs-3 text-white text-center' data-bs-toggle="modal" data-bs-target="#loadModal" @click='quickLinkTo("load")'>
                             Load
                         </div>
@@ -44,5 +44,10 @@ export default {
 <style scoped>
 .titleBackground {
     background-image: url('../assets/interfaces/title_screen.png')
+}
+
+.titleButton {
+    min-width: 70px;
+    max-width: 150px;   
 }
 </style>

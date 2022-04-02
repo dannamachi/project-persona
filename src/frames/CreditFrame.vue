@@ -11,7 +11,7 @@
                  <!-- test -->
                 <!-- <div class='position-absolute bottom-0 start 0 fs-1'>{{ getScrollTopValue() }}</div>
                 <div class='position-absolute bottom-0 start-50 fs-1'>{{ getScrollHeightValue() }}</div> -->
-                <div class='row fs-3 my-4 ps-3 lineBox justify-content-start' v-for='(line, index) in getCreditLines()' :key='index'>
+                <div class='fs-3 my-4 ps-3 lineBox justify-content-start' v-for='(line, index) in getCreditLines()' :key='index'>
                     {{ line }}
                 </div>
             </div>
@@ -70,14 +70,14 @@ export default {
         },
         getCredits() {
             var cString = ''
-            cString += '**************************Gray Solace - NanoReno 2022********************'
-            cString += 'Gray Solace is a Visual Novel made by:**Mochi (coding)**Cree (sprites)**Sarah (backgrounds)**Idle (narrative)************************'
+            cString += '**************************Gray Solace - NanoReno 2022************'
+            cString += 'Gray Solace is a Visual Novel made by:**Mochi (coding)**Cree (sprites)**Sarah (backgrounds)**Idle (narrative)**************'
             cString += 'It was made using:**'
             cString += 'Vue 3: https://vuejs.org/**'
-            cString += 'Script Builder: https://mochimochi95.itch.io/script-writer****************************'
+            cString += 'Script Builder: https://mochimochi95.itch.io/script-writer**************'
             cString += 'Music attributions:**'
             cString += '- Trio for Piano, Cello, and Clarinet by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/4547-trio-for-piano-cello-and-clarinet**License: https://filmmusic.io/standard-license****- White by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/4626-white**License: https://filmmusic.io/standard-license****- Water Lily by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/4609-water-lily**License: https://filmmusic.io/standard-license****- Loss by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/4003-loss**License: https://filmmusic.io/standard-license****- Waltz (Tschikovsky Op. 40) by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/4605-waltz-tschikovsky-op-40-**License: https://filmmusic.io/standard-license****- Facile by Kevin MacLeod**Link: https://incompetech.filmmusic.io/song/3733-facile**License: https://filmmusic.io/standard-license'
-            cString += '************************Thank you for playing !^^************'
+            cString += '************Thank you for playing !^^**********'
             return cString
         }
     }
@@ -91,6 +91,7 @@ export default {
     height: 100%;
 }
 .lineBox {
-    height: 5%;
+    min-height: 5%;
+    overflow-wrap: anywhere;
 }
 </style>

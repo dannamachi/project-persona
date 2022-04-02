@@ -24,7 +24,7 @@
         <div v-else class='container-fluid aboveText pt-3'>
             
           <div v-for='(option, index) in m__getEligibleOptions()' :key='index' class='optionSpacing row justify-content-end'>
-            <div class='col-6'>
+            <div class='col-auto'>
               <div class='bg-black text-white text-end optionBox' @click='selectOption(option)'>
                 {{ option.name }}
               </div>
@@ -254,6 +254,7 @@ export default {
 @media (max-width: 720px) {
   .optionBox {
     font-size: 20px;
+    width: 400px;
   }
   .optionSpacing {
     margin-top: 30px;
@@ -263,6 +264,7 @@ export default {
 @media (min-width: 720px) {
   .optionBox {
     font-size: 30px;
+    width: 600px;
   }
     .optionSpacing {
     margin-top: 35px;

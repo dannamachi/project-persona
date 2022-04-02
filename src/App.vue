@@ -6,7 +6,7 @@
       opacity: opacityValue
     }">
     <!-- main frame -->
-    <CreditFrame v-if='isOfFrame("credit")' @return-title='switchFrame("title")'/>
+    <CreditFrame v-if='isOfFrame("credit")' @return-title='runSwitchFrameWithAnimation("title")'/>
     <StartFrame v-if='isOfFrame("start")' @start-game='runSwitchFrameWithAnimation("dialogue")'/>
     <ProfileFrame v-if='isOfFrame("profile")' @name-change='onUpdateName' v-bind:toggleSuccess='nameChangeSuccess' v-bind:toggleError='nameChangeError' v-bind:playerName='getPlayerNameObject()' @empty-alert='nameChangeSuccess = false; nameChangeError = true'/>
     <TitleFrame v-if='isOfFrame("title")' @quick-link='onQuickLink'/>
@@ -17,7 +17,7 @@
 
     <!-- button to side menu-->
     <div v-if='!isOfFrame("start") && !isOfFrame("credit")' class='position-absolute top-50 start-0 bg-white'>
-      <img src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
+      <img class='sideButton' src='./assets/interfaces/button_openmodal.png' type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"/>
       <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
         Button with data-bs-target
       </button> -->
@@ -683,6 +683,11 @@ export default {
   text-align: center;
   color: #ffffff;
   /* margin-top: 60px; */
+}
+
+.sideButton {
+  width: 50px;
+  height: 50px;
 }
 
 .mainBox {

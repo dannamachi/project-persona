@@ -9,7 +9,7 @@
         }'>
             <div class='row titleBox align-items-center justify-content-center'>
                 <div class='col'>
-                    <img src='../assets/interfaces/logo.png' />
+                    <img class='imageBox' src='../assets/interfaces/logo.png' />
                     <p class='fs-3 btn-link text-white' @click='startGame()'>
                         Start
                     </p>
@@ -30,6 +30,21 @@ export default {
 </script>
 
 <style scoped>
+
+@media (min-width: 630px) {
+  .imageBox {
+    width: 630px;
+    height: 500px;
+  }
+}
+
+@media (max-width: 630px) {
+  .imageBox {
+    width: 100vw;
+    height: calc(100vw / 630 * 500);
+  }
+}
+
 .titleBox {
     height: 100%;
 }
