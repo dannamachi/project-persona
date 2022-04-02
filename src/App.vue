@@ -240,7 +240,7 @@ export default {
     this.getGameHash()
 
     // load interfaces
-    this.ui.textbox = require(PREFIX_UI + 'textbox.jpeg')
+    this.ui.textbox = require(PREFIX_UI + 'textbox.jpg')
 
     // default sprite
     const defaultImg = require(PREFIX_SPRITE + 'default.png')
@@ -714,7 +714,6 @@ export default {
   background-size: calc(100vh * 16 / 10) 100vh;
   /* background-size: 100% 100%; */
   background-repeat: no-repeat;
-  border-style: solid;
 }
 
 .showLeft {

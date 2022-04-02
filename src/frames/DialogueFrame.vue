@@ -203,8 +203,6 @@ export default {
 <style scoped>
 .aboveText {
   height: 70%;
-  border-style: solid;
-  border-color: green;
   /* background-image: url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'),url('assets/Morelle_dazed.png'); */
   background-size: contain,contain,contain;
   background-repeat: no-repeat,no-repeat,no-repeat;
@@ -215,8 +213,6 @@ export default {
   display: inline-block;
   width: 30vh;
   height: 100%;
-  border-style: solid;
-  border-color: rebeccapurple;
   background-position: left;
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -226,22 +222,18 @@ export default {
   display: inline-block;
   width: calc(100% - 30vh);
   height: 100%;
-  border-style: solid;
-  border-color: royalblue;
   background-position: left;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  padding-top: 3.5vmin;
+  padding-top: 2.5vmin;
 }
 
 .textBox {
   width: 100%;
   height: 30%;
-  border-style: solid;
-  border-color: greenyellow;
   /* background-image: url('assets/textbox.jpeg'); */
   /* background-position: left; */
-  padding-right: 0;
+  padding-right: 1rem;
   padding-left: 0;
   background-size: 100% 100%;
   background-repeat: no-repeat;
