@@ -10,7 +10,7 @@
             <div class='row titleBox align-items-center justify-content-center'>
                 <div class='col'>
                     <img src='../assets/interfaces/logo.png' />
-                    <p class='fs-3 btn-link' @click='startGame()'>
+                    <p class='fs-3 btn-link text-white' @click='startGame()'>
                         Start
                     </p>
                 </div>
